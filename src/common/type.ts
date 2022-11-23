@@ -6,9 +6,25 @@ export interface resType<T> {
   };
 }
 
+export interface resData<T> {
+  status: number;
+  data: {
+    data: {
+      rows: T | null;
+      count: number;
+    };
+    message: string;
+  };
+}
+
 export interface resMessage {
   status: number;
   data: {
     message: string;
   };
+}
+
+export interface queryItems {
+  p?: number;
+  limit?: number;
 }
