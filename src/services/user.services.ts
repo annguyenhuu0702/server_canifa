@@ -92,7 +92,7 @@ export const user_services = {
       return {
         status: 200,
         data: {
-          message: "delete successfully",
+          message: "Delete successfully",
         },
       };
     } catch (error) {

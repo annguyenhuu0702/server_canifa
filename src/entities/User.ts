@@ -40,7 +40,9 @@ export class User extends BaseEntity {
   @Column({ default: "" })
   street: string;
 
-  @Column({ default: "" })
+  @Column({
+    default: "",
+  })
   avatar: string;
 
   @Column({
