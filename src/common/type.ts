@@ -25,6 +25,6 @@ export interface resMessage {
 }
 
 export interface queryItems {
-  p?: number;
-  limit?: number;
+  p?: string;
+  limit?: string;
 }

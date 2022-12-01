@@ -107,26 +107,8 @@ export const user_services = {
   },
   getById: async (id: string): Promise<resType<any> | resMessage> => {
     try {
-      const user = await User.findOne({
-        where: {
-          id: parseInt(id),
-        },
-        select: {
-          avatar: true,
-          birthday: true,
-          city: true,
-          createdAt: true,
-          district: true,
-          email: true,
-          fullname: true,
-          gender: true,
-          id: true,
-          updatedAt: true,
-          phone: true,
-          role: true,
-          street: true,
-          ward: true,
-        },
+      const user = await User.findOneBy({
+        id: parseInt(id),
       });
       if (!user) {
         return {
@@ -136,10 +118,11 @@ export const user_services = {
           },
         };
       }
+      const { hash, ...others } = user;
       return {
         status: 200,
         data: {
-          data: user,
+          data: others,
           message: "Success",
         },
       };
@@ -160,8 +143,8 @@ export const user_services = {
         where: {
           role: "user",
         },
-        skip: p,
-        take: limit,
+        ...(limit ? { take: parseInt(limit) } : {}),
+        ...(p && limit ? { skip: parseInt(limit) * (parseInt(p) - 1) } : {}),
       });
 
       const data = users.map((item) => {
