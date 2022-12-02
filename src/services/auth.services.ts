@@ -123,7 +123,7 @@ export const auth_services = {
         maxAge: 24 * 60 * 60 * 1000,
       });
       return {
-        status: 201,
+        status: 200,
         data: {
           data: {
             user: others,
@@ -232,7 +232,7 @@ export const auth_services = {
         body
       );
       return {
-        status: 201,
+        status: 200,
         data: {
           message: "Change profile successfully",
         },
@@ -270,7 +270,7 @@ export const auth_services = {
         }
       }
       return {
-        status: 201,
+        status: 200,
         data: {
           message: "Change password successfully",
         },
@@ -292,7 +292,7 @@ export const auth_services = {
         body
       );
       return {
-        status: 201,
+        status: 200,
         data: {
           message: "Change email successfully",
         },

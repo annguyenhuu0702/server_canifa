@@ -1,7 +1,9 @@
-import { queryItems, resData, resMessage, resType } from "../common/type";
+import { resData, resMessage, resType } from "../common/type";
 import { User } from "../entities/User";
-import { createUser, updateUser } from "../types/user";
+import { createUser, getAllUser, updateUser } from "../types/user";
 import * as argon from "argon2";
+import { AppDataSource } from "../db";
+import { ILike } from "typeorm";
 
 export const user_services = {
   create: async (body: createUser): Promise<resType<any> | resMessage> => {
@@ -37,19 +39,11 @@ export const user_services = {
       };
     }
   },
-  update: async (id: string, body: updateUser): Promise<resMessage> => {
+  update: async (
+    id: string,
+    body: updateUser
+  ): Promise<resType<any> | resMessage> => {
     try {
-      const user = await User.findOneBy({
-        id: parseInt(id),
-      });
-      if (!user) {
-        return {
-          status: 404,
-          data: {
-            message: "User not found!!!!",
-          },
-        };
-      }
       await User.update(
         {
           id: parseInt(id),
@@ -57,7 +51,7 @@ export const user_services = {
         body
       );
       return {
-        status: 201,
+        status: 200,
         data: {
           message: "update successfully",
         },
@@ -74,21 +68,7 @@ export const user_services = {
   },
   delete: async (id: string): Promise<resMessage> => {
     try {
-      const user = await User.findOneBy({
-        id: parseInt(id),
-      });
-      if (!user) {
-        return {
-          status: 404,
-          data: {
-            message: "User not found!!!!",
-          },
-        };
-      }
-      await User.delete({
-        id: parseInt(id),
-      });
-
+      await AppDataSource.getRepository(User).softDelete({ id: parseInt(id) });
       return {
         status: 200,
         data: {
@@ -136,15 +116,34 @@ export const user_services = {
       };
     }
   },
-  getAll: async (query: queryItems): Promise<resData<any> | resMessage> => {
+  getAll: async (query: getAllUser): Promise<resData<any> | resMessage> => {
     try {
-      const { p, limit } = query;
+      const { p, limit, fullname, email, phone } = query;
       const users = await User.find({
         where: {
           role: "user",
+          ...(fullname
+            ? {
+                fullname: ILike(`%${fullname}%`),
+              }
+            : {}),
+          ...(email
+            ? {
+                email: ILike(`%${email}%`),
+              }
+            : {}),
+          ...(phone
+            ? {
+                phone: ILike(`%${phone}%`),
+              }
+            : {}),
         },
+        withDeleted: false,
         ...(limit ? { take: parseInt(limit) } : {}),
         ...(p && limit ? { skip: parseInt(limit) * (parseInt(p) - 1) } : {}),
+        order: {
+          createdAt: "DESC",
+        },
       });
 
       const data = users.map((item) => {

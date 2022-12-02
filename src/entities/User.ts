@@ -6,6 +6,7 @@ import {
   UpdateDateColumn,
   Unique,
   BaseEntity,
+  DeleteDateColumn,
 } from "typeorm";
 
 @Unique(["email"])
@@ -65,4 +66,7 @@ export class User extends BaseEntity {
 
   @UpdateDateColumn()
   updatedAt: string;
+
+  @DeleteDateColumn()
+  deletedAt: Date;
 }

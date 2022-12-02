@@ -1,5 +1,6 @@
 import { DataSource } from "typeorm";
 import { User } from "./entities/User";
+import { Category } from "./entities/Category";
 
 export const AppDataSource = new DataSource({
   type: "postgres",
@@ -10,5 +11,5 @@ export const AppDataSource = new DataSource({
   database: "canifa",
   synchronize: true,
   logging: true,
-  entities: [User],
+  entities: [User, Category],
 });
