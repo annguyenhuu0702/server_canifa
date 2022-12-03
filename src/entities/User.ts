@@ -65,7 +65,7 @@ export class User extends BaseEntity {
   createdAt: Date;
 
   @UpdateDateColumn()
-  updatedAt: string;
+  updatedAt: Date;
 
   @DeleteDateColumn()
   deletedAt: Date;

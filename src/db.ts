@@ -1,6 +1,8 @@
 import { DataSource } from "typeorm";
 import { User } from "./entities/User";
 import { Category } from "./entities/Category";
+import { Collection } from "./entities/Collection";
+import { ProductCategory } from "./entities/ProductCategory";
 
 export const AppDataSource = new DataSource({
   type: "postgres",
@@ -11,5 +13,5 @@ export const AppDataSource = new DataSource({
   database: "canifa",
   synchronize: true,
   logging: true,
-  entities: [User, Category],
+  entities: [User, Category, Collection, ProductCategory],
 });

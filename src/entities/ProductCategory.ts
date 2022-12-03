@@ -6,12 +6,12 @@ import {
   UpdateDateColumn,
   BaseEntity,
   DeleteDateColumn,
-  OneToMany,
+  ManyToOne,
 } from "typeorm";
 import { Collection } from "./Collection";
 
 @Entity()
-export class Category extends BaseEntity {
+export class ProductCategory extends BaseEntity {
   @PrimaryGeneratedColumn()
   id: number;
 
@@ -36,6 +36,9 @@ export class Category extends BaseEntity {
   @DeleteDateColumn()
   deletedAt: Date;
 
-  @OneToMany(() => Collection, (e) => e.category)
-  collections: Collection[];
+  @Column()
+  collectionId: number;
+
+  @ManyToOne(() => Collection, (e) => e.productCategories)
+  collection: Collection;
 }

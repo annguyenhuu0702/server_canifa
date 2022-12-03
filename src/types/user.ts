@@ -12,10 +12,6 @@ export interface updateUser {
   gender: boolean;
 }
 
-export interface deleteUser {
-  id: string | number;
-}
-
 export interface getAllUser extends queryItems {
   email?: string;
   fullname?: string;

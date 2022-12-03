@@ -39,10 +39,7 @@ export const user_services = {
       };
     }
   },
-  update: async (
-    id: string,
-    body: updateUser
-  ): Promise<resType<any> | resMessage> => {
+  update: async (id: string, body: updateUser): Promise<resMessage> => {
     try {
       await User.update(
         {
