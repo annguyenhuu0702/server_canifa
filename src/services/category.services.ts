@@ -1,4 +1,5 @@
-import { resMessage, resType } from "../common/type";
+import { ILike } from "typeorm";
+import { resData, resMessage, resType } from "../common/type";
 import { AppDataSource } from "../db";
 import { Category } from "../entities/Category";
 import {
@@ -77,26 +78,45 @@ export const category_services = {
   },
   getAll: async (
     query: getAllCategory
-  ): Promise<resType<Category[]> | resMessage> => {
+  ): Promise<resData<Category[]> | resMessage> => {
     try {
-      const { p, limit } = query;
+      const { p, limit, name } = query;
       const categories = await Category.find({
-        relations: {
-          collections: {
-            productCategories: true,
-          },
+        where: {
+          ...(name
+            ? {
+                name: ILike(`%${name}%`),
+              }
+            : {}),
         },
+        // relations: {
+        //   collections: {
+        //     productCategories: true,
+        //   },
+        // },
         withDeleted: false,
         ...(limit ? { take: parseInt(limit) } : {}),
         ...(p && limit ? { skip: parseInt(limit) * (parseInt(p) - 1) } : {}),
         order: {
           createdAt: "DESC",
+          collections: {
+            createdAt: "DESC",
+            productCategories: {
+              createdAt: "DESC",
+            },
+          },
         },
+      });
+      const count = await Category.count({
+        withDeleted: false,
       });
       return {
         status: 200,
         data: {
-          data: categories,
+          data: {
+            rows: categories,
+            count,
+          },
           message: "Success",
         },
       };

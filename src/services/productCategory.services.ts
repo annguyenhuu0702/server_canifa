@@ -1,4 +1,4 @@
-import { resMessage, resType } from "../common/type";
+import { resData, resMessage, resType } from "../common/type";
 import { AppDataSource } from "../db";
 import { ProductCategory } from "../entities/ProductCategory";
 import {
@@ -80,10 +80,13 @@ export const productCategory_services = {
   },
   getAll: async (
     query: getAllProductCategory
-  ): Promise<resType<ProductCategory[]> | resMessage> => {
+  ): Promise<resData<ProductCategory[]> | resMessage> => {
     try {
       const { p, limit } = query;
       const data = await ProductCategory.find({
+        relations: {
+          collection: true,
+        },
         withDeleted: false,
         ...(limit ? { take: parseInt(limit) } : {}),
         ...(p && limit ? { skip: parseInt(limit) * (parseInt(p) - 1) } : {}),
@@ -91,10 +94,16 @@ export const productCategory_services = {
           createdAt: "DESC",
         },
       });
+      const count = await ProductCategory.count({
+        withDeleted: false,
+      });
       return {
         status: 200,
         data: {
-          data: data,
+          data: {
+            rows: data,
+            count,
+          },
           message: "Success",
         },
       };

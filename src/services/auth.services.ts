@@ -15,13 +15,13 @@ import jwt from "jsonwebtoken";
 export const auth_services = {
   createAccessToken: (obj: any) => {
     const accessToken = jwt.sign(obj, process.env.AT || "super-serect", {
-      expiresIn: "1h",
+      expiresIn: "24h",
     });
     return accessToken;
   },
   createRefreshToken: (obj: any) => {
     const refreshToken = jwt.sign(obj, process.env.RF || "super-serect", {
-      expiresIn: "24h",
+      expiresIn: "48h",
     });
     return refreshToken;
   },

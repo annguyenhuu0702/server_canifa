@@ -1,4 +1,4 @@
-import { resMessage, resType } from "../common/type";
+import { resData, resMessage, resType } from "../common/type";
 import { AppDataSource } from "../db";
 import { Collection } from "../entities/Collection";
 import {
@@ -77,12 +77,12 @@ export const colletion_services = {
   },
   getAll: async (
     query: getAllCollection
-  ): Promise<resType<Collection[]> | resMessage> => {
+  ): Promise<resData<Collection[]> | resMessage> => {
     try {
       const { p, limit } = query;
       const collections = await Collection.find({
         relations: {
-          productCategories: true,
+          category: true,
         },
         withDeleted: false,
         ...(limit ? { take: parseInt(limit) } : {}),
@@ -91,10 +91,16 @@ export const colletion_services = {
           createdAt: "DESC",
         },
       });
+      const count = await Collection.count({
+        withDeleted: false,
+      });
       return {
         status: 200,
         data: {
-          data: collections,
+          data: {
+            rows: collections,
+            count,
+          },
           message: "Success",
         },
       };
@@ -110,8 +116,13 @@ export const colletion_services = {
   },
   getById: async (id: string): Promise<resType<Collection> | resMessage> => {
     try {
-      const collection = await Collection.findOneBy({
-        id: parseInt(id),
+      const collection = await Collection.findOne({
+        where: {
+          id: parseInt(id),
+        },
+        relations: {
+          category: true,
+        },
       });
       if (!collection) {
         return {
