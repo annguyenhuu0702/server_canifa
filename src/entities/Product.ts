@@ -4,10 +4,13 @@ import {
   CreateDateColumn,
   DeleteDateColumn,
   Entity,
+  ManyToOne,
   OneToMany,
   PrimaryGeneratedColumn,
   UpdateDateColumn,
 } from "typeorm";
+import { Category } from "./Category";
+import { ProductCategory } from "./ProductCategory";
 import { ProductImage } from "./ProductImage";
 import { ProductVariant } from "./ProductVariant";
 
@@ -15,6 +18,9 @@ import { ProductVariant } from "./ProductVariant";
 export class Product extends BaseEntity {
   @PrimaryGeneratedColumn()
   id: number;
+
+  @Column()
+  productCategoryId: number;
 
   @Column()
   name: string;
@@ -48,4 +54,7 @@ export class Product extends BaseEntity {
 
   @OneToMany(() => ProductImage, (e) => e.product)
   productImages: ProductImage[];
+
+  @ManyToOne(() => ProductCategory, (e) => e.products)
+  productCategory: ProductCategory;
 }

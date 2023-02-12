@@ -1,11 +1,8 @@
 import { Router } from "express";
-import { category_controller } from "../../controllers/category.controller";
+import { variantValue_controller } from "../../controllers/variantValue.controller";
 
 const router = Router();
-router.post("/create", category_controller.create);
-router.put("/update/:id", category_controller.update);
-router.delete("/delete/:id", category_controller.delete);
-router.get("/getAll", category_controller.getAll);
-router.get("/getById/:id", category_controller.getById);
+router.post("/create", variantValue_controller.create);
+router.get("/getAll", variantValue_controller.getAll);
 
 export default router;

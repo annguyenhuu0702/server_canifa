@@ -1,12 +1,18 @@
 import { resData, resMessage, resType } from "../common/type";
+import { AppDataSource } from "../db";
+import { Product } from "../entities/Product";
+import { createProduct, getAllProduct, updateProduct } from "../types/product";
 
 export const product_services = {
-  create: async (body: any): Promise<resType<any> | resMessage> => {
+  create: async (
+    body: createProduct
+  ): Promise<resType<Product> | resMessage> => {
     try {
+      const data = await Product.save({ ...body });
       return {
         status: 201,
         data: {
-          data: null,
+          data: data,
           message: "Created success",
         },
       };
@@ -20,7 +26,13 @@ export const product_services = {
       };
     }
   },
-  update: async (id: string, body: any): Promise<resMessage> => {
+  update: async (id: string, body: updateProduct): Promise<resMessage> => {
+    await Product.update(
+      {
+        id: parseInt(id),
+      },
+      body
+    );
     try {
       return {
         status: 200,
@@ -40,6 +52,9 @@ export const product_services = {
   },
   delete: async (id: string): Promise<resMessage> => {
     try {
+      await AppDataSource.getRepository(Product).softDelete({
+        id: parseInt(id),
+      });
       return {
         status: 200,
         data: {
@@ -56,14 +71,28 @@ export const product_services = {
       };
     }
   },
-  getAll: async (query: any): Promise<resData<any> | resMessage> => {
+  getAll: async (
+    query: getAllProduct
+  ): Promise<resData<Product[]> | resMessage> => {
     try {
+      const { p, limit } = query;
+      const [products, count] = await Product.findAndCount({
+        withDeleted: false,
+        ...(limit ? { take: parseInt(limit) } : {}),
+        ...(p && limit ? { skip: parseInt(limit) * (parseInt(p) - 1) } : {}),
+        relations: {
+          productCategory: true,
+        },
+        order: {
+          createdAt: "DESC",
+        },
+      });
       return {
         status: 200,
         data: {
           data: {
-            rows: null,
-            count: 0,
+            rows: products,
+            count,
           },
           message: "Success",
         },
@@ -78,12 +107,25 @@ export const product_services = {
       };
     }
   },
-  getById: async (id: string): Promise<resType<any> | resMessage> => {
+  getById: async (id: string): Promise<resType<Product> | resMessage> => {
     try {
+      const product = await Product.findOne({
+        where: {
+          id: parseInt(id),
+        },
+      });
+      if (!product) {
+        return {
+          status: 404,
+          data: {
+            message: "Not found!",
+          },
+        };
+      }
       return {
         status: 200,
         data: {
-          data: null,
+          data: product,
           message: "Success",
         },
       };

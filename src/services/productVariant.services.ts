@@ -1,12 +1,22 @@
 import { resData, resMessage, resType } from "../common/type";
+import { AppDataSource } from "../db";
+import { ProductVariant } from "../entities/ProductVariant";
+import {
+  createProductVariant,
+  getAllProductVariant,
+  updateProductVariant,
+} from "../types/productVariant";
 
 export const productVariant_services = {
-  create: async (body: any): Promise<resType<any> | resMessage> => {
+  createMany: async (
+    body: createProductVariant[]
+  ): Promise<resType<ProductVariant[]> | resMessage> => {
     try {
+      const data = await AppDataSource.getRepository(ProductVariant).save(body);
       return {
         status: 201,
         data: {
-          data: null,
+          data: data,
           message: "Created success",
         },
       };
@@ -20,7 +30,16 @@ export const productVariant_services = {
       };
     }
   },
-  update: async (id: string, body: any): Promise<resMessage> => {
+  update: async (
+    id: string,
+    body: updateProductVariant
+  ): Promise<resMessage> => {
+    await ProductVariant.update(
+      {
+        id: parseInt(id),
+      },
+      body
+    );
     try {
       return {
         status: 200,
@@ -40,6 +59,9 @@ export const productVariant_services = {
   },
   delete: async (id: string): Promise<resMessage> => {
     try {
+      await AppDataSource.getRepository(ProductVariant).softDelete({
+        id: parseInt(id),
+      });
       return {
         status: 200,
         data: {
@@ -56,14 +78,25 @@ export const productVariant_services = {
       };
     }
   },
-  getAll: async (query: any): Promise<resData<any> | resMessage> => {
+  getAll: async (
+    query: getAllProductVariant
+  ): Promise<resData<ProductVariant[]> | resMessage> => {
     try {
+      const { p, limit } = query;
+      const [productVariants, count] = await ProductVariant.findAndCount({
+        withDeleted: false,
+        ...(limit ? { take: parseInt(limit) } : {}),
+        ...(p && limit ? { skip: parseInt(limit) * (parseInt(p) - 1) } : {}),
+        order: {
+          createdAt: "DESC",
+        },
+      });
       return {
         status: 200,
         data: {
           data: {
-            rows: null,
-            count: 0,
+            rows: productVariants,
+            count,
           },
           message: "Success",
         },
@@ -78,12 +111,27 @@ export const productVariant_services = {
       };
     }
   },
-  getById: async (id: string): Promise<resType<any> | resMessage> => {
+  getById: async (
+    id: string
+  ): Promise<resType<ProductVariant> | resMessage> => {
     try {
+      const productVariant = await ProductVariant.findOne({
+        where: {
+          id: parseInt(id),
+        },
+      });
+      if (!productVariant) {
+        return {
+          status: 404,
+          data: {
+            message: "Not found!",
+          },
+        };
+      }
       return {
         status: 200,
         data: {
-          data: null,
+          data: productVariant,
           message: "Success",
         },
       };

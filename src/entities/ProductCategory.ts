@@ -7,8 +7,10 @@ import {
   BaseEntity,
   DeleteDateColumn,
   ManyToOne,
+  OneToMany,
 } from "typeorm";
 import { Collection } from "./Collection";
+import { Product } from "./Product";
 
 @Entity()
 export class ProductCategory extends BaseEntity {
@@ -41,4 +43,7 @@ export class ProductCategory extends BaseEntity {
 
   @ManyToOne(() => Collection, (e) => e.productCategories)
   collection: Collection;
+
+  @OneToMany(() => Product, (e) => e.productCategory)
+  products: Product[];
 }

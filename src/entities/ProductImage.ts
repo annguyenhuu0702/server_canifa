@@ -21,6 +21,9 @@ export class ProductImage extends BaseEntity {
   @Column()
   variantValueId: number;
 
+  @Column()
+  path: string;
+
   @CreateDateColumn()
   createdAt: Date;
 

@@ -3,7 +3,7 @@ import { productVariant_services } from "../services/productVariant.services";
 
 export const productVariant_controller = {
   create: async (req: Request, res: Response) => {
-    const { data, status } = await productVariant_services.create(req.body);
+    const { data, status } = await productVariant_services.createMany(req.body);
     return res.status(status).json(data);
   },
   update: async (req: Request, res: Response) => {

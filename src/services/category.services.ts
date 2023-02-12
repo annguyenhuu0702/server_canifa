@@ -89,11 +89,11 @@ export const category_services = {
               }
             : {}),
         },
-        // relations: {
-        //   collections: {
-        //     productCategories: true,
-        //   },
-        // },
+        relations: {
+          collections: {
+            productCategories: true,
+          },
+        },
         withDeleted: false,
         ...(limit ? { take: parseInt(limit) } : {}),
         ...(p && limit ? { skip: parseInt(limit) * (parseInt(p) - 1) } : {}),

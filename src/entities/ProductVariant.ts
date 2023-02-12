@@ -11,7 +11,7 @@ import {
   UpdateDateColumn,
 } from "typeorm";
 import { Product } from "./Product";
-import { Variant } from "./Variant";
+import { VariantValue } from "./VariantValue";
 
 @Entity()
 export class ProductVariant extends BaseEntity {
@@ -39,7 +39,7 @@ export class ProductVariant extends BaseEntity {
   @ManyToOne(() => Product, (e) => e.productVariants)
   product: Product;
 
-  @ManyToMany(() => Variant, (e) => e.productVariants)
-  @JoinTable({ name: "productVariant_variant" })
-  variants: Variant[];
+  @ManyToMany(() => VariantValue, (e) => e.productVariants)
+  @JoinTable({ name: "productVariant_variantValues" })
+  variantValues: VariantValue[];
 }

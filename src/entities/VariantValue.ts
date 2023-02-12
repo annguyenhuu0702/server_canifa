@@ -5,9 +5,11 @@ import {
   DeleteDateColumn,
   Entity,
   ManyToMany,
+  ManyToOne,
   PrimaryGeneratedColumn,
   UpdateDateColumn,
 } from "typeorm";
+import { ProductVariant } from "./ProductVariant";
 import { Variant } from "./Variant";
 
 @Entity()
@@ -30,6 +32,9 @@ export class VariantValue extends BaseEntity {
   @DeleteDateColumn()
   deletedAt: Date;
 
-  @ManyToMany(() => Variant, (e) => e.VariantValues)
+  @ManyToOne(() => Variant, (e) => e.VariantValues)
   variant: Variant;
+
+  @ManyToMany(() => ProductVariant, (e) => e.variantValues)
+  productVariants: ProductVariant[];
 }

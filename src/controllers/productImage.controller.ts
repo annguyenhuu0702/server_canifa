@@ -3,7 +3,7 @@ import { productImage_services } from "../services/productImage.services";
 
 export const productImage_controller = {
   create: async (req: Request, res: Response) => {
-    const { data, status } = await productImage_services.create(req.body);
+    const { data, status } = await productImage_services.createMany(req.body);
     return res.status(status).json(data);
   },
   update: async (req: Request, res: Response) => {

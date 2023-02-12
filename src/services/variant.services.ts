@@ -1,12 +1,19 @@
 import { resData, resMessage, resType } from "../common/type";
+import { Variant } from "../entities/Variant";
+import { createVariant, getAllVariant, updateVariant } from "../types/variant";
 
 export const variant_services = {
-  create: async (body: any): Promise<resType<any> | resMessage> => {
+  create: async (
+    body: createVariant
+  ): Promise<resType<Variant> | resMessage> => {
     try {
+      const data = await Variant.save({
+        ...body,
+      });
       return {
         status: 201,
         data: {
-          data: null,
+          data: data,
           message: "Created success",
         },
       };
@@ -20,70 +27,26 @@ export const variant_services = {
       };
     }
   },
-  update: async (id: string, body: any): Promise<resMessage> => {
+  getAll: async (
+    query: getAllVariant
+  ): Promise<resData<Variant[]> | resMessage> => {
     try {
-      return {
-        status: 200,
-        data: {
-          message: "Update successfully",
+      const { p, limit } = query;
+      const [variants, count] = await Variant.findAndCount({
+        withDeleted: false,
+        ...(limit ? { take: parseInt(limit) } : {}),
+        ...(p && limit ? { skip: parseInt(limit) * (parseInt(p) - 1) } : {}),
+        order: {
+          createdAt: "DESC",
         },
-      };
-    } catch (error) {
-      console.log(error);
-      return {
-        status: 500,
-        data: {
-          message: "Error",
-        },
-      };
-    }
-  },
-  delete: async (id: string): Promise<resMessage> => {
-    try {
-      return {
-        status: 200,
-        data: {
-          message: "Delete successfully",
-        },
-      };
-    } catch (error) {
-      console.log(error);
-      return {
-        status: 500,
-        data: {
-          message: "Error",
-        },
-      };
-    }
-  },
-  getAll: async (query: any): Promise<resData<any> | resMessage> => {
-    try {
+      });
       return {
         status: 200,
         data: {
           data: {
-            rows: null,
-            count: 0,
+            rows: variants,
+            count,
           },
-          message: "Success",
-        },
-      };
-    } catch (error) {
-      console.log(error);
-      return {
-        status: 500,
-        data: {
-          message: "Error",
-        },
-      };
-    }
-  },
-  getById: async (id: string): Promise<resType<any> | resMessage> => {
-    try {
-      return {
-        status: 200,
-        data: {
-          data: null,
           message: "Success",
         },
       };

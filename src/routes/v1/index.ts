@@ -1,4 +1,5 @@
 import { Router } from "express";
+import uploadRouter from "./upload.routes";
 import userRouter from "./user.routes";
 import authRouter from "./auth.routes";
 import categoryRouter from "./category.routes";
@@ -11,16 +12,16 @@ import variantValueRouter from "./variantValue.routes";
 import productImageRouter from "./productImage.routes";
 
 const router = Router();
-
+router.use("/api/upload", uploadRouter);
 router.use("/api/user", userRouter);
 router.use("/api/auth", authRouter);
 router.use("/api/category", categoryRouter);
 router.use("/api/collection", collectionRouter);
 router.use("/api/productCategory", productCategoryRouter);
-router.use("/api/product", productCategoryRouter);
-router.use("/api/productVariant", productCategoryRouter);
-router.use("/api/variant", productCategoryRouter);
-router.use("/api/variantValue", productCategoryRouter);
-router.use("/api/productImage", productCategoryRouter);
+router.use("/api/product", productRouter);
+router.use("/api/productVariant", productVariantRouter);
+router.use("/api/variant", variantRouter);
+router.use("/api/variantValue", variantValueRouter);
+router.use("/api/productImage", productImageRouter);
 
 export default router;

@@ -4,13 +4,10 @@ import {
   CreateDateColumn,
   DeleteDateColumn,
   Entity,
-  JoinTable,
-  ManyToMany,
   OneToMany,
   PrimaryGeneratedColumn,
   UpdateDateColumn,
 } from "typeorm";
-import { ProductVariant } from "./ProductVariant";
 import { VariantValue } from "./VariantValue";
 
 @Entity()
@@ -32,8 +29,4 @@ export class Variant extends BaseEntity {
 
   @OneToMany(() => VariantValue, (e) => e.variant)
   VariantValues: VariantValue[];
-
-  @ManyToMany(() => ProductVariant, (e) => e.variants)
-  @JoinTable({ name: "productVariant_variant" })
-  productVariants: ProductVariant[];
 }
