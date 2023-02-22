@@ -8,4 +8,6 @@ export interface createProductImage {
 
 export interface updateProductImage extends createProductImage {}
 
-export interface getAllProductImage extends queryItems {}
+export interface getAllProductImage extends queryItems {
+  productId: string;
+}

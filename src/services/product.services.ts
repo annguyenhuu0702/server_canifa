@@ -1,3 +1,4 @@
+import { ILike } from "typeorm";
 import { resData, resMessage, resType } from "../common/type";
 import { AppDataSource } from "../db";
 import { Product } from "../entities/Product";
@@ -75,13 +76,22 @@ export const product_services = {
     query: getAllProduct
   ): Promise<resData<Product[]> | resMessage> => {
     try {
-      const { p, limit } = query;
+      const { p, limit, name } = query;
       const [products, count] = await Product.findAndCount({
+        where: {
+          ...(name
+            ? {
+                name: ILike(`%${name}%`),
+              }
+            : {}),
+        },
         withDeleted: false,
         ...(limit ? { take: parseInt(limit) } : {}),
         ...(p && limit ? { skip: parseInt(limit) * (parseInt(p) - 1) } : {}),
         relations: {
           productCategory: true,
+          productImages: true,
+          productVariants: true,
         },
         order: {
           createdAt: "DESC",
@@ -112,6 +122,11 @@ export const product_services = {
       const product = await Product.findOne({
         where: {
           id: parseInt(id),
+        },
+        relations: {
+          productCategory: true,
+          productImages: true,
+          productVariants: true,
         },
       });
       if (!product) {

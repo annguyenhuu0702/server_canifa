@@ -9,4 +9,6 @@ export interface createProductCategory {
 
 export interface updateProductCategory extends createProductCategory {}
 
-export interface getAllProductCategory extends queryItems {}
+export interface getAllProductCategory extends queryItems {
+  name?: string;
+}

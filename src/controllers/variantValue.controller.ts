@@ -7,7 +7,9 @@ export const variantValue_controller = {
     return res.status(status).json(data);
   },
   getAll: async (req: Request, res: Response) => {
-    const { data, status } = await variantValue_services.getAll(req.query);
+    const { data, status } = await variantValue_services.getAll(
+      req.query as any
+    );
     return res.status(status).json(data);
   },
 };

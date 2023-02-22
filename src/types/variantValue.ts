@@ -7,4 +7,6 @@ export interface createVariantValue {
 
 export interface updateVariantValue extends createVariantValue {}
 
-export interface getAllVariantValue extends queryItems {}
+export interface getAllVariantValue extends queryItems {
+  variantName: string;
+}

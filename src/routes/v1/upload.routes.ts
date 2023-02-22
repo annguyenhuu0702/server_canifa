@@ -42,7 +42,7 @@ router.post(
           result.push({ path: filePath });
           promiseImgs.push(
             getCloudinary().v2.uploader.upload(filePath, {
-              folder: "canifa/" + Math.random(),
+              folder: "canifa",
             })
           );
           console.log("XÓA::::::::", path + "/" + filePath);

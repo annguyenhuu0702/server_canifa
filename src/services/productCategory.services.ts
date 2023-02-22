@@ -1,3 +1,4 @@
+import { ILike } from "typeorm";
 import { resData, resMessage, resType } from "../common/type";
 import { AppDataSource } from "../db";
 import { ProductCategory } from "../entities/ProductCategory";
@@ -82,8 +83,15 @@ export const productCategory_services = {
     query: getAllProductCategory
   ): Promise<resData<ProductCategory[]> | resMessage> => {
     try {
-      const { p, limit } = query;
+      const { p, limit, name } = query;
       const data = await ProductCategory.find({
+        where: {
+          ...(name
+            ? {
+                name: ILike(`%${name}%`),
+              }
+            : {}),
+        },
         relations: {
           collection: true,
         },

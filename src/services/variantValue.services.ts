@@ -31,7 +31,7 @@ export const variantValue_services = {
     query: getAllVariantValue
   ): Promise<resData<VariantValue[]> | resMessage> => {
     try {
-      const { p, limit } = query;
+      const { p, limit, variantName } = query;
       const [variantValues, count] = await VariantValue.findAndCount({
         withDeleted: false,
         ...(limit ? { take: parseInt(limit) } : {}),
@@ -39,6 +39,7 @@ export const variantValue_services = {
         order: {
           createdAt: "DESC",
         },
+        ...(variantName ? { variant: { name: variantName } } : {}),
       });
       return {
         status: 200,

@@ -9,4 +9,6 @@ export interface createCollection {
 
 export interface updateCollection extends createCollection {}
 
-export interface getAllCollection extends queryItems {}
+export interface getAllCollection extends queryItems {
+  name?: string;
+}

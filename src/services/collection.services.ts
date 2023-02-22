@@ -1,3 +1,4 @@
+import { ILike } from "typeorm";
 import { resData, resMessage, resType } from "../common/type";
 import { AppDataSource } from "../db";
 import { Collection } from "../entities/Collection";
@@ -79,12 +80,20 @@ export const colletion_services = {
     query: getAllCollection
   ): Promise<resData<Collection[]> | resMessage> => {
     try {
-      const { p, limit } = query;
+      const { p, limit, name } = query;
       const collections = await Collection.find({
+        where: {
+          ...(name
+            ? {
+                name: ILike(`%${name}%`),
+              }
+            : {}),
+        },
         relations: {
           category: true,
         },
         withDeleted: false,
+
         ...(limit ? { take: parseInt(limit) } : {}),
         ...(p && limit ? { skip: parseInt(limit) * (parseInt(p) - 1) } : {}),
         order: {

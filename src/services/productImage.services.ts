@@ -82,20 +82,21 @@ export const productImage_services = {
     query: getAllProductImage
   ): Promise<resData<ProductImage[]> | resMessage> => {
     try {
-      const { p, limit } = query;
-      const [productVariants, count] = await ProductImage.findAndCount({
+      const { p, limit, productId } = query;
+      const [productImages, count] = await ProductImage.findAndCount({
         withDeleted: false,
         ...(limit ? { take: parseInt(limit) } : {}),
         ...(p && limit ? { skip: parseInt(limit) * (parseInt(p) - 1) } : {}),
         order: {
           createdAt: "DESC",
         },
+        ...(productId ? { productId: +productId } : {}),
       });
       return {
         status: 200,
         data: {
           data: {
-            rows: productVariants,
+            rows: productImages,
             count,
           },
           message: "Success",
