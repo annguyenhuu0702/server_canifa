@@ -9,6 +9,6 @@ export const AppDataSource = new DataSource({
   password: "hoacomuadong5",
   database: "canifa",
   synchronize: true,
-  logging: true,
+  logging: false,
   entities: [path.join(__dirname, "/entities/*")],
 });

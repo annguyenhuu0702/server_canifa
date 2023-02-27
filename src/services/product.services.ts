@@ -1,5 +1,6 @@
 import { ILike } from "typeorm";
 import { resData, resMessage, resType } from "../common/type";
+import { getCloudinary } from "../config/configCloudinary";
 import { AppDataSource } from "../db";
 import { Product } from "../entities/Product";
 import { createProduct, getAllProduct, updateProduct } from "../types/product";
@@ -28,12 +29,28 @@ export const product_services = {
     }
   },
   update: async (id: string, body: updateProduct): Promise<resMessage> => {
+    const item = await Product.findOne({
+      where: {
+        id: parseInt(id),
+      },
+    });
     await Product.update(
       {
         id: parseInt(id),
       },
       body
     );
+    if (item) {
+      if (item.thumbnail && item.thumbnail !== body.thumbnail) {
+        await getCloudinary().v2.uploader.destroy(
+          "canifa" + item.thumbnail.split("canifa")[1].split(".")[0]
+        );
+      }
+    }
+    await Product.save({
+      ...item,
+      ...body,
+    });
     try {
       return {
         status: 200,
@@ -53,9 +70,17 @@ export const product_services = {
   },
   delete: async (id: string): Promise<resMessage> => {
     try {
-      await AppDataSource.getRepository(Product).softDelete({
+      const item = await AppDataSource.getRepository(Product).findOneBy({
         id: parseInt(id),
       });
+      if (item) {
+        await getCloudinary().v2.uploader.destroy(
+          "canifa" + item.thumbnail.split("canifa")[1].split(".")[0]
+        );
+        await AppDataSource.getRepository(Product).softDelete({
+          id: item.id,
+        });
+      }
       return {
         status: 200,
         data: {
@@ -76,12 +101,38 @@ export const product_services = {
     query: getAllProduct
   ): Promise<resData<Product[]> | resMessage> => {
     try {
-      const { p, limit, name } = query;
-      const [products, count] = await Product.findAndCount({
+      const { p, limit, name, slug, otherSlug } = query;
+      const [data, count] = await Product.findAndCount({
         where: {
           ...(name
             ? {
                 name: ILike(`%${name}%`),
+              }
+            : {}),
+          ...(slug
+            ? {
+                slug,
+              }
+            : {}),
+          ...(otherSlug
+            ? {
+                productCategory: [
+                  {
+                    slug: otherSlug,
+                  },
+                  {
+                    collection: {
+                      slug: otherSlug,
+                    },
+                  },
+                  {
+                    collection: {
+                      category: {
+                        slug: otherSlug,
+                      },
+                    },
+                  },
+                ],
               }
             : {}),
         },
@@ -101,7 +152,7 @@ export const product_services = {
         status: 200,
         data: {
           data: {
-            rows: products,
+            rows: data,
             count,
           },
           message: "Success",

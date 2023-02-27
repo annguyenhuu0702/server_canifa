@@ -11,4 +11,5 @@ export interface updateCollection extends createCollection {}
 
 export interface getAllCollection extends queryItems {
   name?: string;
+  slug?: string;
 }

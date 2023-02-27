@@ -11,4 +11,5 @@ export interface updateProductCategory extends createProductCategory {}
 
 export interface getAllProductCategory extends queryItems {
   name?: string;
+  slug?: string;
 }

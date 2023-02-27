@@ -12,7 +12,7 @@ router.post(
   async (req: Request, res: Response) => {
     if (req.file) {
       const image = await getCloudinary().v2.uploader.upload(req.file.path, {
-        folder: "canifa/" + Math.random(),
+        folder: "canifa",
       });
       const unlinkAsync = promisify(unlink);
       const path = __dirname.split("src")[0];

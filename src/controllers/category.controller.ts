@@ -25,4 +25,10 @@ export const category_controller = {
     const { data, status } = await category_services.getById(req.params.id);
     return res.status(status).json(data);
   },
+  getBySlug: async (req: Request, res: Response) => {
+    const { data, status } = await category_services.getBySlug(
+      req.params.categorySlug
+    );
+    return res.status(status).json(data);
+  },
 };

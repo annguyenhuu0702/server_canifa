@@ -14,4 +14,6 @@ export interface updateProduct extends createProduct {}
 
 export interface getAllProduct extends queryItems {
   name?: string;
+  slug?: string;
+  otherSlug?: string;
 }

@@ -1,5 +1,6 @@
 import { ILike } from "typeorm";
 import { resData, resMessage, resType } from "../common/type";
+import { getCloudinary } from "../config/configCloudinary";
 import { AppDataSource } from "../db";
 import { Collection } from "../entities/Collection";
 import {
@@ -33,12 +34,28 @@ export const colletion_services = {
   },
   update: async (id: string, body: updateCollection): Promise<resMessage> => {
     try {
+      const item = await Collection.findOne({
+        where: {
+          id: parseInt(id),
+        },
+      });
       await Collection.update(
         {
           id: parseInt(id),
         },
         body
       );
+      if (item) {
+        if (item.thumbnail && item.thumbnail !== body.thumbnail) {
+          await getCloudinary().v2.uploader.destroy(
+            "canifa" + item.thumbnail.split("canifa")[1].split(".")[0]
+          );
+        }
+      }
+      await Collection.save({
+        ...item,
+        ...body,
+      });
       return {
         status: 200,
         data: {
@@ -57,9 +74,17 @@ export const colletion_services = {
   },
   delete: async (id: string): Promise<resMessage> => {
     try {
-      await AppDataSource.getRepository(Collection).softDelete({
+      const item = await AppDataSource.getRepository(Collection).findOneBy({
         id: parseInt(id),
       });
+      if (item) {
+        await getCloudinary().v2.uploader.destroy(
+          "canifa" + item.thumbnail.split("canifa")[1].split(".")[0]
+        );
+        await AppDataSource.getRepository(Collection).softDelete({
+          id: item.id,
+        });
+      }
       return {
         status: 200,
         data: {
@@ -80,12 +105,17 @@ export const colletion_services = {
     query: getAllCollection
   ): Promise<resData<Collection[]> | resMessage> => {
     try {
-      const { p, limit, name } = query;
-      const collections = await Collection.find({
+      const { p, limit, name, slug } = query;
+      const [data, count] = await Collection.findAndCount({
         where: {
           ...(name
             ? {
                 name: ILike(`%${name}%`),
+              }
+            : {}),
+          ...(slug
+            ? {
+                slug,
               }
             : {}),
         },
@@ -93,21 +123,18 @@ export const colletion_services = {
           category: true,
         },
         withDeleted: false,
-
         ...(limit ? { take: parseInt(limit) } : {}),
         ...(p && limit ? { skip: parseInt(limit) * (parseInt(p) - 1) } : {}),
         order: {
           createdAt: "DESC",
         },
       });
-      const count = await Collection.count({
-        withDeleted: false,
-      });
+
       return {
         status: 200,
         data: {
           data: {
-            rows: collections,
+            rows: data,
             count,
           },
           message: "Success",

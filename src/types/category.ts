@@ -11,4 +11,6 @@ export interface updateCategory extends createCategory {}
 
 export interface getAllCategory extends queryItems {
   name?: string;
+  slug?: string;
+  collections?: boolean;
 }
