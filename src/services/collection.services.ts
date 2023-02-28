@@ -105,7 +105,7 @@ export const colletion_services = {
     query: getAllCollection
   ): Promise<resData<Collection[]> | resMessage> => {
     try {
-      const { p, limit, name, slug } = query;
+      const { p, limit, productCategories, name, slug } = query;
       const [data, count] = await Collection.findAndCount({
         where: {
           ...(name
@@ -120,13 +120,28 @@ export const colletion_services = {
             : {}),
         },
         relations: {
-          category: true,
+          category: productCategories
+            ? { collections: { productCategories: true } }
+            : true,
         },
         withDeleted: false,
         ...(limit ? { take: parseInt(limit) } : {}),
         ...(p && limit ? { skip: parseInt(limit) * (parseInt(p) - 1) } : {}),
         order: {
           createdAt: "DESC",
+          ...(productCategories
+            ? {
+                category: {
+                  createdAt: "DESC",
+                  collections: {
+                    createdAt: "DESC",
+                    productCategories: {
+                      createdAt: "DESC",
+                    },
+                  },
+                },
+              }
+            : {}),
         },
       });
 

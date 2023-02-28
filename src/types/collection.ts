@@ -10,6 +10,8 @@ export interface createCollection {
 export interface updateCollection extends createCollection {}
 
 export interface getAllCollection extends queryItems {
+  productCategories?: boolean;
+  collection?: boolean;
   name?: string;
   slug?: string;
 }

@@ -110,7 +110,7 @@ export const productCategory_services = {
     query: getAllProductCategory
   ): Promise<resData<ProductCategory[]> | resMessage> => {
     try {
-      const { p, limit, name, slug } = query;
+      const { p, limit, collection, name, slug } = query;
       const [data, count] = await ProductCategory.findAndCount({
         where: {
           ...(name
@@ -125,13 +125,37 @@ export const productCategory_services = {
             : {}),
         },
         relations: {
-          collection: true,
+          collection: collection
+            ? {
+                category: {
+                  collections: {
+                    productCategories: true,
+                  },
+                },
+              }
+            : true,
         },
         withDeleted: false,
         ...(limit ? { take: parseInt(limit) } : {}),
         ...(p && limit ? { skip: parseInt(limit) * (parseInt(p) - 1) } : {}),
         order: {
           createdAt: "DESC",
+          ...(collection
+            ? {
+                collection: {
+                  createdAt: "DESC",
+                  category: {
+                    createdAt: "DESC",
+                    collections: {
+                      createdAt: "DESC",
+                      productCategories: {
+                        createdAt: "DESC",
+                      },
+                    },
+                  },
+                },
+              }
+            : {}),
         },
       });
 

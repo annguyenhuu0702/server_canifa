@@ -4,6 +4,7 @@ import { createUser, getAllUser, updateUser } from "../types/user";
 import * as argon from "argon2";
 import { AppDataSource } from "../db";
 import { ILike } from "typeorm";
+import { getCloudinary } from "../config/configCloudinary";
 
 export const user_services = {
   create: async (body: createUser): Promise<resType<any> | resMessage> => {
@@ -41,12 +42,28 @@ export const user_services = {
   },
   update: async (id: string, body: updateUser): Promise<resMessage> => {
     try {
+      const item = await User.findOne({
+        where: {
+          id: parseInt(id),
+        },
+      });
       await User.update(
         {
           id: parseInt(id),
         },
         body
       );
+      if (item) {
+        if (item.avatar && item.avatar !== body.avatar) {
+          await getCloudinary().v2.uploader.destroy(
+            "canifa" + item.avatar.split("canifa")[1].split(".")[0]
+          );
+        }
+      }
+      await User.save({
+        ...item,
+        ...body,
+      });
       return {
         status: 200,
         data: {
@@ -65,7 +82,16 @@ export const user_services = {
   },
   delete: async (id: string): Promise<resMessage> => {
     try {
-      await AppDataSource.getRepository(User).softDelete({ id: parseInt(id) });
+      const item = await AppDataSource.getRepository(User).findOneBy({
+        id: parseInt(id),
+      });
+      if (item) {
+        await getCloudinary().v2.uploader.destroy(
+          "canifa" + item.avatar.split("canifa")[1].split(".")[0]
+        );
+        await AppDataSource.getRepository(User).softDelete({ id: item.id });
+      }
+      // await AppDataSource.getRepository(User).softDelete({ id: parseInt(id) });
       return {
         status: 200,
         data: {

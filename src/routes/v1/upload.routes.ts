@@ -45,7 +45,7 @@ router.post(
               folder: "canifa",
             })
           );
-          console.log("XÓA::::::::", path + "/" + filePath);
+          console.log("delete::::::::", path + "/" + filePath);
           promises.push(unlinkAsync(path + "/" + filePath));
         }
         const resultImgs = await Promise.all(promiseImgs);
