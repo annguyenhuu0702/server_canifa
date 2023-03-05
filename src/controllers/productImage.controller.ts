@@ -10,13 +10,7 @@ export const productImage_controller = {
     const { data, status } = await productImage_services.createMany(req.body);
     return res.status(status).json(data);
   },
-  update: async (req: Request, res: Response) => {
-    const { data, status } = await productImage_services.update(
-      req.params.id,
-      req.body
-    );
-    return res.status(status).json(data);
-  },
+
   delete: async (req: Request, res: Response) => {
     const { data, status } = await productImage_services.delete(req.params.id);
     return res.status(status).json(data);

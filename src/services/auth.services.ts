@@ -267,21 +267,22 @@ export const auth_services = {
             })
             .where("id = :id", { id: data.id })
             .execute();
+
+          return {
+            status: 200,
+            data: {
+              message: "Change password successfully",
+            },
+          };
         }
       }
-      return {
-        status: 200,
-        data: {
-          message: "Change password successfully",
-        },
-      };
     } catch (error) {
       console.log(error);
-      return {
-        status: 500,
-        data: { message: "Error" },
-      };
     }
+    return {
+      status: 500,
+      data: { message: "Error" },
+    };
   },
   changeEmail: async (data: any, body: changeEmail): Promise<resMessage> => {
     try {

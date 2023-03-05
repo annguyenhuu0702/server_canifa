@@ -1,19 +1,68 @@
 import { resData, resMessage, resType } from "../common/type";
 import { getCloudinary } from "../config/configCloudinary";
 import { AppDataSource } from "../db";
+import { Product } from "../entities/Product";
 import { ProductImage } from "../entities/ProductImage";
 import { createProductImage, getAllProductImage } from "../types/productImage";
+import { In } from "typeorm";
 
 export const productImage_services = {
   createMany: async (
-    body: createProductImage[]
+    body: createProductImage
   ): Promise<resType<ProductImage[]> | resMessage> => {
     try {
-      const data = await AppDataSource.getRepository(ProductImage).save(body);
+      const { productId, listId, pathImgs, thumbnail, updateImages } = body;
+      if (updateImages.length > 0) {
+        await AppDataSource.getRepository(ProductImage).save(updateImages);
+      }
+      if (thumbnail !== "") {
+        const item = await Product.findOne({
+          where: {
+            id: productId,
+          },
+        });
+        if (item && item.thumbnail !== thumbnail && item.thumbnail) {
+          await getCloudinary().v2.uploader.destroy(
+            "canifa" + item.thumbnail.split("canifa")[1].split(".")[0]
+          );
+        }
+        await AppDataSource.getRepository(Product).update(
+          {
+            id: productId,
+          },
+          {
+            thumbnail,
+          }
+        );
+      }
+      if (listId.length > 0) {
+        const promises: Array<Promise<any>> = [];
+        const items = await ProductImage.find({
+          where: {
+            id: In(listId),
+          },
+        });
+        items.forEach((item) => {
+          promises.push(
+            getCloudinary().v2.uploader.destroy(
+              "canifa" + item.path.split("canifa")[1].split(".")[0]
+            )
+          );
+        });
+        await AppDataSource.getRepository(ProductImage).delete(listId);
+        await Promise.all(promises);
+      }
+      if (pathImgs.length > 0) {
+        await AppDataSource.getRepository(ProductImage).save(
+          pathImgs.map((item) => ({
+            ...item,
+            productId,
+          }))
+        );
+      }
       return {
         status: 201,
         data: {
-          data: data,
           message: "Created success",
         },
       };
@@ -27,30 +76,7 @@ export const productImage_services = {
       };
     }
   },
-  update: async (id: string, body: ProductImage): Promise<resMessage> => {
-    await ProductImage.update(
-      {
-        id: parseInt(id),
-      },
-      body
-    );
-    try {
-      return {
-        status: 200,
-        data: {
-          message: "Update successfully",
-        },
-      };
-    } catch (error) {
-      console.log(error);
-      return {
-        status: 500,
-        data: {
-          message: "Error",
-        },
-      };
-    }
-  },
+
   delete: async (id: string): Promise<resMessage> => {
     try {
       const item = await AppDataSource.getRepository(ProductImage).findOneBy({
@@ -84,13 +110,15 @@ export const productImage_services = {
     try {
       const { p, limit, productId } = query;
       const [productImages, count] = await ProductImage.findAndCount({
+        where: {
+          ...(productId ? { productId: +productId } : {}),
+        },
         withDeleted: false,
         ...(limit ? { take: parseInt(limit) } : {}),
         ...(p && limit ? { skip: parseInt(limit) * (parseInt(p) - 1) } : {}),
         order: {
           createdAt: "DESC",
         },
-        ...(productId ? { productId: +productId } : {}),
       });
       return {
         status: 200,

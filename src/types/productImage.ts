@@ -1,9 +1,15 @@
 import { queryItems } from "../common/type";
+import { ProductImage } from "../entities/ProductImage";
 
 export interface createProductImage {
   productId: number;
-  variantValueId: number;
-  path: string;
+  pathImgs: Array<{
+    variantValueId: number;
+    path: string;
+  }>;
+  listId: number[];
+  thumbnail: string;
+  updateImages: ProductImage[];
 }
 
 export interface updateProductImage extends createProductImage {}
