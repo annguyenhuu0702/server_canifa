@@ -141,8 +141,8 @@ export const product_services = {
         ...(p && limit ? { skip: parseInt(limit) * (parseInt(p) - 1) } : {}),
         relations: {
           productCategory: true,
-          // productImages: true,
-          // productVariants: true,
+          productImages: true,
+          productVariants: true,
         },
         order: {
           createdAt: "DESC",

@@ -77,19 +77,23 @@ export const productCategory_services = {
   },
   delete: async (id: string): Promise<resMessage> => {
     try {
-      const item = await AppDataSource.getRepository(ProductCategory).findOneBy(
-        {
-          id: parseInt(id),
-        }
-      );
-      if (item) {
-        await getCloudinary().v2.uploader.destroy(
-          "canifa" + item.thumbnail.split("canifa")[1].split(".")[0]
-        );
-        await AppDataSource.getRepository(ProductCategory).softDelete({
-          id: item.id,
-        });
-      }
+      // const item = await AppDataSource.getRepository(ProductCategory).findOneBy(
+      //   {
+      //     id: parseInt(id),
+      //   }
+      // );
+      // // if (item) {
+      //   await getCloudinary().v2.uploader.destroy(
+      //     "canifa" + item.thumbnail.split("canifa")[1].split(".")[0]
+      //   );
+      //   await AppDataSource.getRepository(ProductCategory).softDelete({
+      //     id: item.id,
+      //   });
+      // }
+
+      await AppDataSource.getRepository(ProductCategory).softDelete({
+        id: parseInt(id),
+      });
       return {
         status: 200,
         data: {

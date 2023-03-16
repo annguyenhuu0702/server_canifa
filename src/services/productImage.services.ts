@@ -12,20 +12,12 @@ export const productImage_services = {
   ): Promise<resType<ProductImage[]> | resMessage> => {
     try {
       const { productId, listId, pathImgs, thumbnail, updateImages } = body;
+      // update màu
       if (updateImages.length > 0) {
         await AppDataSource.getRepository(ProductImage).save(updateImages);
       }
+      // update ảnh đại diện
       if (thumbnail !== "") {
-        const item = await Product.findOne({
-          where: {
-            id: productId,
-          },
-        });
-        if (item && item.thumbnail !== thumbnail && item.thumbnail) {
-          await getCloudinary().v2.uploader.destroy(
-            "canifa" + item.thumbnail.split("canifa")[1].split(".")[0]
-          );
-        }
         await AppDataSource.getRepository(Product).update(
           {
             id: productId,
@@ -35,7 +27,11 @@ export const productImage_services = {
           }
         );
       }
+      //xóa ảnh
       if (listId.length > 0) {
+        const product = await AppDataSource.getRepository(Product).findOneBy({
+          id: productId,
+        });
         const promises: Array<Promise<any>> = [];
         const items = await ProductImage.find({
           where: {
@@ -43,6 +39,18 @@ export const productImage_services = {
           },
         });
         items.forEach((item) => {
+          if (item.path === product?.thumbnail) {
+            promises.push(
+              AppDataSource.getRepository(Product).update(
+                {
+                  id: productId,
+                },
+                {
+                  thumbnail: "",
+                }
+              )
+            );
+          }
           promises.push(
             getCloudinary().v2.uploader.destroy(
               "canifa" + item.path.split("canifa")[1].split(".")[0]
@@ -52,6 +60,8 @@ export const productImage_services = {
         await AppDataSource.getRepository(ProductImage).delete(listId);
         await Promise.all(promises);
       }
+
+      // thêm ảnh mới
       if (pathImgs.length > 0) {
         await AppDataSource.getRepository(ProductImage).save(
           pathImgs.map((item) => ({
@@ -127,38 +137,6 @@ export const productImage_services = {
             rows: productImages,
             count,
           },
-          message: "Success",
-        },
-      };
-    } catch (error) {
-      console.log(error);
-      return {
-        status: 500,
-        data: {
-          message: "Error",
-        },
-      };
-    }
-  },
-  getById: async (id: string): Promise<resType<ProductImage> | resMessage> => {
-    try {
-      const data = await ProductImage.findOne({
-        where: {
-          id: parseInt(id),
-        },
-      });
-      if (!data) {
-        return {
-          status: 404,
-          data: {
-            message: "Not found!",
-          },
-        };
-      }
-      return {
-        status: 200,
-        data: {
-          data: data,
           message: "Success",
         },
       };

@@ -21,8 +21,4 @@ export const productImage_controller = {
     );
     return res.status(status).json(data);
   },
-  getById: async (req: Request, res: Response) => {
-    const { data, status } = await productImage_services.getById(req.params.id);
-    return res.status(status).json(data);
-  },
 };
