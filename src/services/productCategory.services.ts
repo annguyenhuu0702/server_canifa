@@ -14,11 +14,12 @@ export const productCategory_services = {
     body: createProductCategory
   ): Promise<resType<ProductCategory> | resMessage> => {
     try {
-      const data = await ProductCategory.save({ ...body });
+      const productCategory = await ProductCategory.save({ ...body });
+
       return {
         status: 201,
         data: {
-          data: data,
+          data: productCategory,
           message: "Created success",
         },
       };
@@ -77,23 +78,22 @@ export const productCategory_services = {
   },
   delete: async (id: string): Promise<resMessage> => {
     try {
-      // const item = await AppDataSource.getRepository(ProductCategory).findOneBy(
-      //   {
-      //     id: parseInt(id),
-      //   }
-      // );
-      // // if (item) {
-      //   await getCloudinary().v2.uploader.destroy(
-      //     "canifa" + item.thumbnail.split("canifa")[1].split(".")[0]
-      //   );
-      //   await AppDataSource.getRepository(ProductCategory).softDelete({
-      //     id: item.id,
-      //   });
-      // }
+      const item = await AppDataSource.getRepository(ProductCategory).findOneBy(
+        {
+          id: parseInt(id),
+        }
+      );
+      if (item) {
+        if (item.thumbnail && item.thumbnail !== "") {
+          await getCloudinary().v2.uploader.destroy(
+            "canifa" + item.thumbnail.split("canifa")[1].split(".")[0]
+          );
+        }
+        await AppDataSource.getRepository(ProductCategory).softDelete({
+          id: item.id,
+        });
+      }
 
-      await AppDataSource.getRepository(ProductCategory).softDelete({
-        id: parseInt(id),
-      });
       return {
         status: 200,
         data: {

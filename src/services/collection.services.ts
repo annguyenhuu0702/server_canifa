@@ -15,6 +15,7 @@ export const colletion_services = {
   ): Promise<resType<Collection> | resMessage> => {
     try {
       const collection = await Collection.save({ ...body });
+
       return {
         status: 201,
         data: {
@@ -37,6 +38,9 @@ export const colletion_services = {
       const item = await Collection.findOne({
         where: {
           id: parseInt(id),
+        },
+        relations: {
+          category: true,
         },
       });
       await Collection.update(
@@ -74,20 +78,20 @@ export const colletion_services = {
   },
   delete: async (id: string): Promise<resMessage> => {
     try {
-      // const item = await AppDataSource.getRepository(Collection).findOneBy({
-      //   id: parseInt(id),
-      // });
-      // if (item) {
-      //   await getCloudinary().v2.uploader.destroy(
-      //     "canifa" + item.thumbnail.split("canifa")[1].split(".")[0]
-      //   );
-      //   await AppDataSource.getRepository(Collection).softDelete({
-      //     id: item.id,
-      //   });
-      // }
-      await AppDataSource.getRepository(Collection).softDelete({
+      const item = await AppDataSource.getRepository(Collection).findOneBy({
         id: parseInt(id),
       });
+      if (item) {
+        if (item.thumbnail && item.thumbnail !== "") {
+          await getCloudinary().v2.uploader.destroy(
+            "canifa" + item.thumbnail.split("canifa")[1].split(".")[0]
+          );
+        }
+        await AppDataSource.getRepository(Collection).softDelete({
+          id: item.id,
+        });
+      }
+
       return {
         status: 200,
         data: {

@@ -10,11 +10,12 @@ export const product_services = {
     body: createProduct
   ): Promise<resType<Product> | resMessage> => {
     try {
-      const data = await Product.save({ ...body });
+      const product = await Product.save({ ...body });
+
       return {
         status: 201,
         data: {
-          data: data,
+          data: product,
           message: "Created success",
         },
       };
@@ -74,9 +75,11 @@ export const product_services = {
         id: parseInt(id),
       });
       if (item) {
-        await getCloudinary().v2.uploader.destroy(
-          "canifa" + item.thumbnail.split("canifa")[1].split(".")[0]
-        );
+        if (item.thumbnail && item.thumbnail !== "") {
+          await getCloudinary().v2.uploader.destroy(
+            "canifa" + item.thumbnail.split("canifa")[1].split(".")[0]
+          );
+        }
         await AppDataSource.getRepository(Product).softDelete({
           id: item.id,
         });

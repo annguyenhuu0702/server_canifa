@@ -86,12 +86,13 @@ export const user_services = {
         id: parseInt(id),
       });
       if (item) {
-        await getCloudinary().v2.uploader.destroy(
-          "canifa" + item.avatar.split("canifa")[1].split(".")[0]
-        );
+        if (item.avatar && item.avatar !== "") {
+          await getCloudinary().v2.uploader.destroy(
+            "canifa" + item.avatar.split("canifa")[1].split(".")[0]
+          );
+        }
         await AppDataSource.getRepository(User).softDelete({ id: item.id });
       }
-      // await AppDataSource.getRepository(User).softDelete({ id: parseInt(id) });
       return {
         status: 200,
         data: {

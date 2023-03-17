@@ -78,12 +78,13 @@ export const category_services = {
         id: parseInt(id),
       });
       if (item) {
-        await getCloudinary().v2.uploader.destroy(
-          "canifa" + item.thumbnail.split("canifa")[1].split(".")[0]
-        );
+        if (item.thumbnail && item.thumbnail !== "") {
+          await getCloudinary().v2.uploader.destroy(
+            "canifa" + item.thumbnail.split("canifa")[1].split(".")[0]
+          );
+        }
         await AppDataSource.getRepository(Category).softDelete({ id: item.id });
       }
-
       return {
         status: 200,
         data: {

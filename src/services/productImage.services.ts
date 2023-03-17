@@ -87,33 +87,6 @@ export const productImage_services = {
     }
   },
 
-  delete: async (id: string): Promise<resMessage> => {
-    try {
-      const item = await AppDataSource.getRepository(ProductImage).findOneBy({
-        id: parseInt(id),
-      });
-      if (item) {
-        await getCloudinary().v2.uploader.destroy(
-          "canifa" + item.path.split("canifa")[1].split(".")[0]
-        );
-        await AppDataSource.getRepository(ProductImage).delete({ id: item.id });
-      }
-      return {
-        status: 200,
-        data: {
-          message: "Delete successfully",
-        },
-      };
-    } catch (error) {
-      console.log(error);
-      return {
-        status: 500,
-        data: {
-          message: "Error",
-        },
-      };
-    }
-  },
   getAll: async (
     query: getAllProductImage
   ): Promise<resData<ProductImage[]> | resMessage> => {
