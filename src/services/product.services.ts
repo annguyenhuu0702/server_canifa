@@ -41,13 +41,7 @@ export const product_services = {
       },
       body
     );
-    if (item) {
-      if (item.thumbnail && item.thumbnail !== body.thumbnail) {
-        await getCloudinary().v2.uploader.destroy(
-          "canifa" + item.thumbnail.split("canifa")[1].split(".")[0]
-        );
-      }
-    }
+
     await Product.save({
       ...item,
       ...body,
@@ -169,6 +163,12 @@ export const product_services = {
           message: "Error",
         },
       };
+    }
+  },
+  getByCategory: async (slug: string): Promise<any> => {
+    try {
+    } catch (error) {
+      console.log(error);
     }
   },
   getById: async (id: string): Promise<resType<Product> | resMessage> => {
