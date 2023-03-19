@@ -2,8 +2,15 @@ import { ILike } from "typeorm";
 import { resData, resMessage, resType } from "../common/type";
 import { getCloudinary } from "../config/configCloudinary";
 import { AppDataSource } from "../db";
+import { Collection } from "../entities/Collection";
 import { Product } from "../entities/Product";
-import { createProduct, getAllProduct, updateProduct } from "../types/product";
+import { ProductCategory } from "../entities/ProductCategory";
+import {
+  createProduct,
+  getAllProduct,
+  getByCategory,
+  updateProduct,
+} from "../types/product";
 
 export const product_services = {
   create: async (
@@ -165,10 +172,72 @@ export const product_services = {
       };
     }
   },
-  getByCategory: async (slug: string): Promise<any> => {
+  getByCategory: async (
+    query: getByCategory,
+    slug: string
+  ): Promise<resData<any> | resMessage> => {
+    const { limitCollection, limitProduct } = query;
     try {
+      const collections = await Collection.find({
+        where: {
+          category: {
+            slug,
+          },
+        },
+        ...(limitCollection ? { take: parseInt(limitCollection) } : {}),
+        relations: {
+          category: true,
+        },
+      });
+
+      const productsCategory = await Promise.all(
+        collections.map((item) => {
+          return ProductCategory.findOne({
+            where: {
+              collectionId: item.id,
+            },
+          });
+        })
+      );
+
+      const products = await Promise.all(
+        productsCategory.map((item) => {
+          return Product.find({
+            where: {
+              productCategoryId: item ? item.id : 0,
+            },
+            relations: {
+              productCategory: true,
+            },
+            ...(limitProduct ? { take: parseInt(limitProduct) } : {}),
+          });
+        })
+      );
+      const data = products.map((item) => {
+        return {
+          productCategory: item.length > 0 ? item[0].productCategory : null,
+          products: item,
+        };
+      });
+      const count = data.length;
+      return {
+        status: 200,
+        data: {
+          data: {
+            rows: data,
+            count,
+          },
+          message: "Success",
+        },
+      };
     } catch (error) {
       console.log(error);
+      return {
+        status: 500,
+        data: {
+          message: "Error",
+        },
+      };
     }
   },
   getById: async (id: string): Promise<resType<Product> | resMessage> => {

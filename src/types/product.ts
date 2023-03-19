@@ -17,3 +17,8 @@ export interface getAllProduct extends queryItems {
   slug?: string;
   otherSlug?: string;
 }
+
+export interface getByCategory {
+  limitCollection?: string;
+  limitProduct?: string;
+}

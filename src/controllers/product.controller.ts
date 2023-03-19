@@ -23,6 +23,7 @@ export const product_controller = {
   },
   getByCategory: async (req: Request, res: Response) => {
     const { data, status } = await product_services.getByCategory(
+      req.query,
       req.params.slug
     );
     return res.status(status).json(data);
