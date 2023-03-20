@@ -21,6 +21,7 @@ export interface changeProfile {
   city?: string;
   district?: string;
   ward?: string;
+  address?: string;
 }
 
 export interface changePassword {
