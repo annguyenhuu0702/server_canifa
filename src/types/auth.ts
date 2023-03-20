@@ -22,6 +22,7 @@ export interface changeProfile {
   district?: string;
   ward?: string;
   address?: string;
+  avatar?: string;
 }
 
 export interface changePassword {

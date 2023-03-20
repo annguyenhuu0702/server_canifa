@@ -11,6 +11,7 @@ import {
 } from "../types/auth";
 import * as argon from "argon2";
 import jwt from "jsonwebtoken";
+import { getCloudinary } from "../config/configCloudinary";
 
 export const auth_services = {
   createAccessToken: (obj: any) => {
@@ -225,12 +226,22 @@ export const auth_services = {
     body: changeProfile
   ): Promise<resMessage> => {
     try {
-      await User.update(
-        {
-          id: data.id,
+      const item = await User.findOne({
+        where: {
+          id: parseInt(data.id),
         },
-        body
-      );
+      });
+      if (item) {
+        if (item.avatar && item.avatar !== body.avatar) {
+          await getCloudinary().v2.uploader.destroy(
+            "canifa" + item.avatar.split("canifa")[1].split(".")[0]
+          );
+        }
+      }
+      await User.save({
+        ...item,
+        ...body,
+      });
       return {
         status: 200,
         data: {
