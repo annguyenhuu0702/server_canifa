@@ -7,11 +7,17 @@ import { prod } from "./constants";
 
 const app = express();
 
+// app.use(
+//   cors({
+//     origin: prod ? process.env.CORS_ORIGIN_PROD : process.env.CORS_ORIGIN_DEV,
+//     credentials: true,
+//     methods: ["GET", "POST", "PUT", "PATCH", "DELETE"],
+//   })
+// );
 app.use(
   cors({
-    origin: prod ? process.env.CORS_ORIGIN_PROD : process.env.CORS_ORIGIN_DEV,
     credentials: true,
-    methods: ["GET", "POST", "PUT", "PATCH", "DELETE"],
+    origin: true,
   })
 );
 app.use(cookieParser());

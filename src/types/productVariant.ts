@@ -1,12 +1,19 @@
 import { queryItems } from "../common/type";
+import { ProductVariant } from "../entities/ProductVariant";
 import { VariantValue } from "../entities/VariantValue";
 
 export interface createProductVariant {
   productId: number;
+  name: string;
   inventory: number;
   variantValues: VariantValue[];
 }
 
-export interface updateProductVariant extends createProductVariant {}
+export interface updateProductVariant {
+  productVariants: createProductVariant[];
+  isProductVariants: ProductVariant[];
+}
 
-export interface getAllProductVariant extends queryItems {}
+export interface getAllProductVariant extends queryItems {
+  productId: string;
+}

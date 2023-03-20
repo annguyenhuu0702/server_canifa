@@ -146,7 +146,9 @@ export const product_services = {
         relations: {
           productCategory: true,
           productImages: true,
-          productVariants: true,
+          productVariants: {
+            variantValues: true,
+          },
         },
         order: {
           createdAt: "DESC",
@@ -208,6 +210,7 @@ export const product_services = {
             },
             relations: {
               productCategory: true,
+              productImages: true,
             },
             ...(limitProduct ? { take: parseInt(limitProduct) } : {}),
           });

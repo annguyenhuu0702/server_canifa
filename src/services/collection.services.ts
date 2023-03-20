@@ -39,9 +39,6 @@ export const colletion_services = {
         where: {
           id: parseInt(id),
         },
-        relations: {
-          category: true,
-        },
       });
       await Collection.update(
         {
