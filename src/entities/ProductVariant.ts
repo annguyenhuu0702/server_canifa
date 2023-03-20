@@ -22,7 +22,7 @@ export class ProductVariant extends BaseEntity {
   productId: number;
 
   @Column()
-  slug: string;
+  name: string;
 
   @Column()
   inventory: number;

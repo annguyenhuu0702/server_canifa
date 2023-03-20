@@ -3,7 +3,6 @@ import { VariantValue } from "../entities/VariantValue";
 
 export interface createProductVariant {
   productId: number;
-  slug: string;
   inventory: number;
   variantValues: VariantValue[];
 }

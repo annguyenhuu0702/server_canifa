@@ -39,7 +39,7 @@ export class User extends BaseEntity {
   district: string;
 
   @Column({ default: "" })
-  street: string;
+  address: string;
 
   @Column({
     default: "",
