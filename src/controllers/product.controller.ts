@@ -28,8 +28,8 @@ export const product_controller = {
     );
     return res.status(status).json(data);
   },
-  getById: async (req: Request, res: Response) => {
-    const { data, status } = await product_services.getById(req.params.id);
+  getBySlug: async (req: Request, res: Response) => {
+    const { data, status } = await product_services.getBySlug(req.params.slug);
     return res.status(status).json(data);
   },
 };

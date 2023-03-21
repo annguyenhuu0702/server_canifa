@@ -61,6 +61,11 @@ export class User extends BaseEntity {
   })
   role: string;
 
+  @Column({
+    default: 0,
+  })
+  accumulatedPoints: number;
+
   @CreateDateColumn()
   createdAt: Date;
 

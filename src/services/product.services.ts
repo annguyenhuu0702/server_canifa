@@ -243,23 +243,29 @@ export const product_services = {
       };
     }
   },
-  getById: async (id: string): Promise<resType<Product> | resMessage> => {
+  getBySlug: async (slug: string): Promise<resType<Product> | resMessage> => {
     try {
       const product = await Product.findOne({
         where: {
-          id: parseInt(id),
+          slug,
         },
         relations: {
-          productCategory: true,
+          productCategory: {
+            collection: {
+              category: true,
+            },
+          },
           productImages: true,
-          productVariants: true,
+          productVariants: {
+            variantValues: true,
+          },
         },
       });
       if (!product) {
         return {
           status: 404,
           data: {
-            message: "Not found!",
+            message: "Product not found!",
           },
         };
       }
