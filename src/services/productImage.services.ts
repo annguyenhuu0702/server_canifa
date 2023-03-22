@@ -60,7 +60,6 @@ export const productImage_services = {
         await AppDataSource.getRepository(ProductImage).delete(listId);
         await Promise.all(promises);
       }
-
       // thêm ảnh mới
       if (pathImgs.length > 0) {
         await AppDataSource.getRepository(ProductImage).save(

@@ -1,10 +1,12 @@
 import { ILike } from "typeorm";
+import { makeid } from "../common";
 import { resData, resMessage, resType } from "../common/type";
 import { getCloudinary } from "../config/configCloudinary";
 import { AppDataSource } from "../db";
 import { Collection } from "../entities/Collection";
 import { Product } from "../entities/Product";
 import { ProductCategory } from "../entities/ProductCategory";
+import { ProductVariant } from "../entities/ProductVariant";
 import {
   createProduct,
   getAllProduct,
@@ -17,8 +19,7 @@ export const product_services = {
     body: createProduct
   ): Promise<resType<Product> | resMessage> => {
     try {
-      const product = await Product.save({ ...body });
-
+      const product = await Product.save({ ...body, code: makeid(9) });
       return {
         status: 201,
         data: {
@@ -75,6 +76,7 @@ export const product_services = {
       const item = await AppDataSource.getRepository(Product).findOneBy({
         id: parseInt(id),
       });
+
       if (item) {
         if (item.thumbnail && item.thumbnail !== "") {
           await getCloudinary().v2.uploader.destroy(
@@ -161,6 +163,38 @@ export const product_services = {
             rows: data,
             count,
           },
+          message: "Success",
+        },
+      };
+    } catch (error) {
+      console.log(error);
+      return {
+        status: 500,
+        data: {
+          message: "Error",
+        },
+      };
+    }
+  },
+  getById: async (id: string): Promise<resType<Product> | resMessage> => {
+    try {
+      const product = await Product.findOne({
+        where: {
+          id: parseInt(id),
+        },
+      });
+      if (!product) {
+        return {
+          status: 404,
+          data: {
+            message: "Product not found!",
+          },
+        };
+      }
+      return {
+        status: 200,
+        data: {
+          data: product,
           message: "Success",
         },
       };

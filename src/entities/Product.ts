@@ -8,12 +8,13 @@ import {
   OneToMany,
   PrimaryGeneratedColumn,
   UpdateDateColumn,
+  Unique,
 } from "typeorm";
-import { Category } from "./Category";
 import { ProductCategory } from "./ProductCategory";
 import { ProductImage } from "./ProductImage";
 import { ProductVariant } from "./ProductVariant";
 
+@Unique(["code"])
 @Entity()
 export class Product extends BaseEntity {
   @PrimaryGeneratedColumn()
@@ -24,6 +25,11 @@ export class Product extends BaseEntity {
 
   @Column()
   name: string;
+
+  @Column({
+    unique: true,
+  })
+  code: string;
 
   @Column()
   slug: string;
