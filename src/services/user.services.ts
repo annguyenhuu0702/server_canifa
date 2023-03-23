@@ -5,6 +5,7 @@ import * as argon from "argon2";
 import { AppDataSource } from "../db";
 import { ILike } from "typeorm";
 import { getCloudinary } from "../config/configCloudinary";
+import { cart_services } from "./cart.services";
 
 export const user_services = {
   create: async (body: createUser): Promise<resType<any> | resMessage> => {
@@ -28,6 +29,9 @@ export const user_services = {
         ...others,
       });
       const { hash: _hash, ...other } = data;
+      await cart_services.create({
+        userId: other.id,
+      });
       return {
         status: 201,
         data: { data: other, message: "Created success" },

@@ -2,7 +2,7 @@ export interface resType<T> {
   status: number;
   data: {
     data: T | null;
-    message: string;
+    message?: string;
   };
 }
 
@@ -13,7 +13,7 @@ export interface resData<T> {
       rows: T | null;
       count: number;
     };
-    message: string;
+    message?: string;
   };
 }
 

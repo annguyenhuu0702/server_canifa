@@ -1,8 +1,13 @@
 import { Router } from "express";
 import { cartItem_controller } from "../../controllers/cartItem.controller";
+import { auth_middlewares } from "../../middlewares/auth.middleware";
 
 const router = Router();
 
-router.post("/create", cartItem_controller.create);
+router.post(
+  "/create",
+  auth_middlewares.loginRequire,
+  cartItem_controller.create
+);
 
 export default router;

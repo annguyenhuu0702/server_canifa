@@ -245,6 +245,9 @@ export const product_services = {
             relations: {
               productCategory: true,
               productImages: true,
+              productVariants: {
+                variantValues: true,
+              },
             },
             ...(limitProduct ? { take: parseInt(limitProduct) } : {}),
           });

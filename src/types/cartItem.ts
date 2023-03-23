@@ -1,5 +1,4 @@
 type createCartItem = {
-  cartId: number;
   productVariantId: number;
   quantity: number;
 };

@@ -1,5 +1,8 @@
-import { Response, Request } from "express";
+import * as argon from "argon2";
+import { Request, Response } from "express";
+import jwt from "jsonwebtoken";
 import { resMessage, resType } from "../common/type";
+import { getCloudinary } from "../config/configCloudinary";
 import { User } from "../entities/User";
 import {
   changeEmail,
@@ -9,9 +12,7 @@ import {
   register,
   typeAuth,
 } from "../types/auth";
-import * as argon from "argon2";
-import jwt from "jsonwebtoken";
-import { getCloudinary } from "../config/configCloudinary";
+import { cart_services } from "./cart.services";
 
 export const auth_services = {
   createAccessToken: (obj: any) => {
@@ -49,6 +50,9 @@ export const auth_services = {
         fullname: body.fullname,
       });
       const { hash: _hash, ...others } = user;
+      await cart_services.create({
+        userId: others.id,
+      });
       const accessToken = auth_services.createAccessToken({
         id: user.id,
         role: user.role,
