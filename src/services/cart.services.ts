@@ -1,15 +1,18 @@
-import { resMessage, resType } from "../common/type";
+import { resData, resMessage, resType } from "../common/type";
 import { Cart } from "../entities/Cart";
 import { createCart } from "../types/cart";
 
 export const cart_services = {
-  getAll: async (): Promise<resType<Cart[]> | resMessage> => {
+  getAll: async (): Promise<resData<Cart[]> | resMessage> => {
     try {
-      const data = await Cart.find();
+      const [data, count] = await Cart.findAndCount();
       return {
         status: 200,
         data: {
-          data: data,
+          data: {
+            rows: data,
+            count,
+          },
           message: "success",
         },
       };

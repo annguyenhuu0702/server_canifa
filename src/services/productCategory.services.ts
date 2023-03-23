@@ -187,8 +187,13 @@ export const productCategory_services = {
     id: string
   ): Promise<resType<ProductCategory> | resMessage> => {
     try {
-      const data = await ProductCategory.findOneBy({
-        id: parseInt(id),
+      const data = await ProductCategory.findOne({
+        where: {
+          id: parseInt(id),
+        },
+        relations: {
+          collection: true,
+        },
       });
       if (!data) {
         return {

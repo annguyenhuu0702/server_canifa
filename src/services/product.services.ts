@@ -182,6 +182,9 @@ export const product_services = {
         where: {
           id: parseInt(id),
         },
+        relations: {
+          productCategory: true,
+        },
       });
       if (!product) {
         return {
