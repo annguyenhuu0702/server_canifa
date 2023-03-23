@@ -10,6 +10,8 @@ import productVariantRouter from "./productVariant.routes";
 import variantRouter from "./variant.routes";
 import variantValueRouter from "./variantValue.routes";
 import productImageRouter from "./productImage.routes";
+import cartItemRouter from "./cartItem.routes";
+import cartRouter from "./cart.routes";
 
 const router = Router();
 router.use("/api/upload", uploadRouter);
@@ -23,5 +25,7 @@ router.use("/api/productVariant", productVariantRouter);
 router.use("/api/variant", variantRouter);
 router.use("/api/variantValue", variantValueRouter);
 router.use("/api/productImage", productImageRouter);
+router.use("/api/cartItem", cartItemRouter);
+router.use("/api/cart", cartRouter);
 
 export default router;

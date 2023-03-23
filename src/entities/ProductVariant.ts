@@ -7,9 +7,11 @@ import {
   JoinTable,
   ManyToMany,
   ManyToOne,
+  OneToMany,
   PrimaryGeneratedColumn,
   UpdateDateColumn,
 } from "typeorm";
+import { CartItem } from "./CartItem";
 import { Product } from "./Product";
 import { VariantValue } from "./VariantValue";
 
@@ -38,6 +40,9 @@ export class ProductVariant extends BaseEntity {
 
   @ManyToOne(() => Product, (e) => e.productVariants)
   product: Product;
+
+  @OneToMany(() => CartItem, (e) => e.productVariant)
+  cartItem: CartItem;
 
   @ManyToMany(() => VariantValue, (e) => e.productVariants)
   @JoinTable({ name: "productVariant_variantValues" })

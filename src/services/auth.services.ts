@@ -16,7 +16,7 @@ import { getCloudinary } from "../config/configCloudinary";
 export const auth_services = {
   createAccessToken: (obj: any) => {
     const accessToken = jwt.sign(obj, process.env.AT || "super-serect", {
-      expiresIn: "5400h",
+      expiresIn: "360h",
     });
     return accessToken;
   },

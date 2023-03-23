@@ -10,6 +10,7 @@ import {
   UpdateDateColumn,
   Unique,
 } from "typeorm";
+import { CartItem } from "./CartItem";
 import { ProductCategory } from "./ProductCategory";
 import { ProductImage } from "./ProductImage";
 import { ProductVariant } from "./ProductVariant";
