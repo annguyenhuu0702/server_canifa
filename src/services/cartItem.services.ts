@@ -10,6 +10,10 @@ export const cartItem_services = {
     userId: number
   ): Promise<resType<any> | resMessage> => {
     try {
+      // tìm cart theo userId
+      // nếu có cart thì check productVariantId
+      // nếu có productVariantId thì check item trong giỏ hàng theo cartId và productVariantId
+      // nếu mà có productVariantId thì cập nhật số lượng không thì tạo mới cart
       let findCart = await Cart.findOne({
         where: {
           userId: userId,
@@ -36,6 +40,7 @@ export const cartItem_services = {
               ? checkCartItem.quantity + body.quantity
               : body.quantity,
           });
+
           return {
             status: 201,
             data: {

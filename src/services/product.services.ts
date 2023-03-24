@@ -283,7 +283,11 @@ export const product_services = {
       };
     }
   },
-  getBySlug: async (slug: string): Promise<resType<Product> | resMessage> => {
+  getBySlug: async (
+    slug: string
+  ): Promise<
+    resType<{ product: Product; productsRelated: Product[] }> | resMessage
+  > => {
     try {
       const product = await Product.findOne({
         where: {
@@ -301,6 +305,7 @@ export const product_services = {
           },
         },
       });
+
       if (!product) {
         return {
           status: 404,
@@ -309,10 +314,30 @@ export const product_services = {
           },
         };
       }
+      const productsRelated = await Product.find({
+        where: {
+          productCategoryId: product.productCategory.id,
+        },
+        take: 4,
+        relations: {
+          productCategory: {
+            collection: {
+              category: true,
+            },
+          },
+          productImages: true,
+          productVariants: {
+            variantValues: true,
+          },
+        },
+      });
       return {
         status: 200,
         data: {
-          data: product,
+          data: {
+            product: product,
+            productsRelated,
+          },
           message: "Success",
         },
       };

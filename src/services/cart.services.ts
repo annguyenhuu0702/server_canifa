@@ -64,6 +64,11 @@ export const cart_services = {
             },
           },
         },
+        order: {
+          cartItems: {
+            id: "DESC",
+          },
+        },
       });
       return {
         status: 200,
