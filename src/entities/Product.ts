@@ -7,10 +7,10 @@ import {
   ManyToOne,
   OneToMany,
   PrimaryGeneratedColumn,
-  UpdateDateColumn,
   Unique,
+  UpdateDateColumn,
 } from "typeorm";
-import { CartItem } from "./CartItem";
+import { FavoriteProduct } from "./LoveProduct";
 import { ProductCategory } from "./ProductCategory";
 import { ProductImage } from "./ProductImage";
 import { ProductVariant } from "./ProductVariant";
@@ -64,4 +64,7 @@ export class Product extends BaseEntity {
 
   @ManyToOne(() => ProductCategory, (e) => e.products)
   productCategory: ProductCategory;
+
+  @OneToMany(() => FavoriteProduct, (e) => e.product)
+  favoriteProducts: FavoriteProduct[];
 }

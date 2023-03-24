@@ -1,17 +1,23 @@
 import { resData, resMessage, resType } from "../common/type";
-import { Cart } from "../entities/Cart";
-import { createCart } from "../types/cart";
+import { FavoriteProduct } from "../entities/LoveProduct";
+import { getAllFavoriteProduct } from "../types/favoriteProduct";
 
-export const cart_services = {
-  getAll: async (): Promise<resData<Cart[]> | resMessage> => {
+export const favoriteProduct_services = {
+  getAll: async (
+    query: getAllFavoriteProduct
+  ): Promise<resData<FavoriteProduct[]> | resMessage> => {
     try {
-      const [data, count] = await Cart.findAndCount();
+      const { p, limit } = query;
+      const [data, count] = await FavoriteProduct.findAndCount({
+        ...(limit ? { take: parseInt(limit) } : {}),
+        ...(p && limit ? { skip: parseInt(limit) * parseInt(p) - 1 } : {}),
+      });
       return {
         status: 200,
         data: {
           data: {
             rows: data,
-            count,
+            count: count,
           },
           message: "success",
         },
@@ -26,10 +32,14 @@ export const cart_services = {
       };
     }
   },
-  create: async (body: createCart): Promise<resType<Cart> | resMessage> => {
+  create: async (
+    body: any,
+    userId: number
+  ): Promise<resType<FavoriteProduct> | resMessage> => {
     try {
-      const data = await Cart.save({
-        ...body,
+      const data = await FavoriteProduct.save({
+        userId,
+        productId: body.productId,
       });
       return {
         status: 201,
@@ -48,32 +58,20 @@ export const cart_services = {
       };
     }
   },
-  getByUser: async (userId: number): Promise<resType<Cart> | resMessage> => {
+  getByUser: async (
+    userId: number
+  ): Promise<resType<FavoriteProduct> | resMessage> => {
     try {
-      const data = await Cart.findOne({
+      const data = await FavoriteProduct.findOne({
         where: {
           userId,
-        },
-        relations: {
-          cartItems: {
-            productVariant: {
-              variantValues: true,
-              product: {
-                productImages: true,
-              },
-            },
-          },
-        },
-        order: {
-          cartItems: {
-            id: "DESC",
-          },
         },
       });
       return {
         status: 200,
         data: {
           data: data,
+          message: "success",
         },
       };
     } catch (error) {

@@ -8,22 +8,19 @@ import {
   PrimaryGeneratedColumn,
   UpdateDateColumn,
 } from "typeorm";
-import { Cart } from "./Cart";
-import { ProductVariant } from "./ProductVariant";
+
+import { Product } from "./Product";
 
 @Entity()
-export class CartItem extends BaseEntity {
+export class FavoriteProduct extends BaseEntity {
   @PrimaryGeneratedColumn()
   id: number;
 
   @Column()
-  cartId: number;
+  productId: number;
 
   @Column()
-  productVariantId: number;
-
-  @Column()
-  quantity: number;
+  userId: number;
 
   @CreateDateColumn()
   createdAt: Date;
@@ -34,9 +31,6 @@ export class CartItem extends BaseEntity {
   @DeleteDateColumn()
   deletedAt: Date;
 
-  @ManyToOne(() => Cart, (e) => e.cartItems)
-  cart: Cart;
-
-  @ManyToOne(() => ProductVariant, (e) => e.cartItem)
-  productVariant: ProductVariant;
+  @ManyToOne(() => Product, (e) => e.favoriteProducts)
+  product: Product;
 }
