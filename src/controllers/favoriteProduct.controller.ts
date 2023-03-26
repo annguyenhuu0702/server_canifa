@@ -14,8 +14,16 @@ export const favoriteProduct_controller = {
     );
     return res.status(status).json(data);
   },
+  delete: async (req: Request, res: Response) => {
+    const { data, status } = await favoriteProduct_services.delete(
+      req.params.productId,
+      res.locals.user.id
+    );
+    return res.status(status).json(data);
+  },
   getByUser: async (req: Request, res: Response) => {
     const { data, status } = await favoriteProduct_services.getByUser(
+      req.query,
       res.locals.user.id
     );
     return res.status(status).json(data);

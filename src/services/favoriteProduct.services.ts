@@ -1,6 +1,10 @@
 import { resData, resMessage, resType } from "../common/type";
+import { AppDataSource } from "../db";
 import { FavoriteProduct } from "../entities/LoveProduct";
-import { getAllFavoriteProduct } from "../types/favoriteProduct";
+import {
+  createFavoriteProduct,
+  getAllFavoriteProduct,
+} from "../types/favoriteProduct";
 
 export const favoriteProduct_services = {
   getAll: async (
@@ -33,7 +37,7 @@ export const favoriteProduct_services = {
     }
   },
   create: async (
-    body: any,
+    body: createFavoriteProduct,
     userId: number
   ): Promise<resType<FavoriteProduct> | resMessage> => {
     try {
@@ -58,19 +62,60 @@ export const favoriteProduct_services = {
       };
     }
   },
-  getByUser: async (
+  delete: async (
+    productId: string,
     userId: number
-  ): Promise<resType<FavoriteProduct> | resMessage> => {
+  ): Promise<resType<any> | resMessage> => {
     try {
-      const data = await FavoriteProduct.findOne({
-        where: {
-          userId,
-        },
+      await FavoriteProduct.delete({
+        productId: parseInt(productId),
+        userId,
       });
       return {
         status: 200,
         data: {
-          data: data,
+          data: "",
+          message: "deleted success",
+        },
+      };
+    } catch (error) {
+      console.log(error);
+      return {
+        status: 500,
+        data: {
+          message: "Error",
+        },
+      };
+    }
+  },
+  getByUser: async (
+    query: getAllFavoriteProduct,
+    userId: number
+  ): Promise<resData<FavoriteProduct[]> | resMessage> => {
+    try {
+      const { p, limit } = query;
+      const [data, count] = await FavoriteProduct.findAndCount({
+        where: {
+          userId,
+        },
+        relations: {
+          product: {
+            productVariants: {
+              variantValues: true,
+            },
+            productImages: true,
+          },
+        },
+        ...(limit ? { take: parseInt(limit) } : {}),
+        ...(p && limit ? { skip: parseInt(limit) * parseInt(p) - 1 } : {}),
+      });
+      return {
+        status: 200,
+        data: {
+          data: {
+            rows: data,
+            count,
+          },
           message: "success",
         },
       };
