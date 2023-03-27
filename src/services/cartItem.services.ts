@@ -2,7 +2,7 @@ import { resMessage, resType } from "../common/type";
 import { Cart } from "../entities/Cart";
 import { CartItem } from "../entities/CartItem";
 import { ProductVariant } from "../entities/ProductVariant";
-import { createCartItem } from "../types/cartItem";
+import { createCartItem, updateCartItem } from "../types/cartItem";
 
 export const cartItem_services = {
   create: async (
@@ -59,5 +59,76 @@ export const cartItem_services = {
         message: "Error",
       },
     };
+  },
+  update: async (
+    id: string,
+    body: updateCartItem,
+    userId: number
+  ): Promise<resMessage> => {
+    try {
+      let findCart = await Cart.findOne({
+        where: {
+          userId,
+        },
+      });
+      if (findCart) {
+        if (body.quantity === 0) {
+          await CartItem.delete({
+            id: parseInt(id),
+          });
+        } else {
+          await CartItem.update(
+            {
+              id: parseInt(id),
+            },
+            {
+              quantity: body.quantity,
+            }
+          );
+        }
+      }
+      return {
+        status: 200,
+        data: {
+          message: "update successfully",
+        },
+      };
+    } catch (error) {
+      console.log(error);
+      return {
+        status: 500,
+        data: {
+          message: "Error",
+        },
+      };
+    }
+  },
+  delete: async (id: string, userId: number): Promise<resMessage> => {
+    try {
+      const findCart = await Cart.findOne({
+        where: {
+          userId,
+        },
+      });
+      if (findCart) {
+        await CartItem.delete({
+          id: parseInt(id),
+        });
+      }
+      return {
+        status: 200,
+        data: {
+          message: "delete successfully",
+        },
+      };
+    } catch (error) {
+      console.log(error);
+      return {
+        status: 500,
+        data: {
+          message: "Error",
+        },
+      };
+    }
   },
 };

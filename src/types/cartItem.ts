@@ -3,4 +3,8 @@ type createCartItem = {
   quantity: number;
 };
 
-export type { createCartItem };
+type updateCartItem = {
+  quantity: number;
+};
+
+export type { createCartItem, updateCartItem };

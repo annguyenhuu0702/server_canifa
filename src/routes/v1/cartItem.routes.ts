@@ -10,4 +10,16 @@ router.post(
   cartItem_controller.create
 );
 
+router.put(
+  "/update/:id",
+  auth_middlewares.loginRequire,
+  cartItem_controller.update
+);
+
+router.delete(
+  "/delete/:id",
+  auth_middlewares.loginRequire,
+  cartItem_controller.delete
+);
+
 export default router;

@@ -75,13 +75,11 @@ export const productVariant_services = {
         },
         relations: {
           variantValues: true,
+          product: true,
         },
         withDeleted: false,
         ...(limit ? { take: parseInt(limit) } : {}),
         ...(p && limit ? { skip: parseInt(limit) * (parseInt(p) - 1) } : {}),
-        order: {
-          createdAt: "DESC",
-        },
       });
       return {
         status: 200,
