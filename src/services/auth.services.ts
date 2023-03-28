@@ -8,8 +8,10 @@ import {
   changeEmail,
   changePassword,
   changeProfile,
+  fogotPassword,
   login,
   register,
+  resetPassword,
   typeAuth,
 } from "../types/auth";
 import { cart_services } from "./cart.services";
@@ -143,6 +145,137 @@ export const auth_services = {
         status: 500,
         data: {
           message: "Error",
+        },
+      };
+    }
+  },
+  fogotPassword: async (body: fogotPassword): Promise<any> => {
+    try {
+      const { email } = body;
+      const oldUser = await User.findOne({
+        where: {
+          email,
+        },
+      });
+      if (!oldUser) {
+        return {
+          status: 404,
+          data: {
+            message: "User not exists!",
+          },
+        };
+      }
+      const serect = process.env.JWT_SERECT + oldUser.hash;
+      const token = jwt.sign(
+        {
+          email: oldUser.email,
+          id: oldUser.id,
+        },
+        serect,
+        {
+          expiresIn: "1h",
+        }
+      );
+      return {
+        status: 200,
+        data: {
+          data: {
+            id: oldUser.id,
+            token,
+          },
+          message: "success",
+        },
+      };
+    } catch (error) {
+      console.log(error);
+      return {
+        status: 500,
+        data: {
+          message: "error",
+        },
+      };
+    }
+  },
+  resetPassword: async (id: string, token: string): Promise<any> => {
+    try {
+      const oldUser = await User.findOne({
+        where: {
+          id: parseInt(id),
+        },
+      });
+      if (!oldUser) {
+        return {
+          status: 404,
+          data: {
+            message: "User not exists!",
+          },
+        };
+      }
+      const serect = process.env.JWT_SERECT + oldUser.hash;
+      const verify: any = jwt.verify(token, serect);
+      const email = verify.email;
+      return {
+        status: 200,
+        data: {
+          data: email,
+          message: "success",
+        },
+      };
+    } catch (error) {
+      console.log(error);
+      return {
+        status: 500,
+        data: {
+          message: "error",
+        },
+      };
+    }
+  },
+  postResetPassword: async (
+    id: string,
+    token: string,
+    body: resetPassword
+  ): Promise<any> => {
+    try {
+      const { password } = body;
+      console.log(id, password);
+      // const { password } = body;
+      // const oldUser = await User.findOne({
+      //   where: {
+      //     id: parseInt(id),
+      //   },
+      // });
+      // if (!oldUser) {
+      //   return {
+      //     status: 404,
+      //     data: {
+      //       message: "User not exists!",
+      //     },
+      //   };
+      // }
+      // const serect = process.env.JWT_SERECT + oldUser.hash;
+      // const verify = jwt.verify(token, serect);
+      // const hash = await argon.hash(password);
+      // await User.update(
+      //   {
+      //     id: parseInt(id),
+      //   },
+      //   {
+      //     hash,
+      //   }
+      // );
+      return {
+        status: 200,
+        data: {
+          message: "Update password success",
+        },
+      };
+    } catch (error) {
+      console.log(error);
+      return {
+        status: 500,
+        data: {
+          message: "error",
         },
       };
     }

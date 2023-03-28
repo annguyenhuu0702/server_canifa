@@ -6,6 +6,9 @@ const router = Router();
 
 router.post("/register", auth_controller.register);
 router.post("/login", auth_controller.login);
+router.post("/fogotPassword", auth_controller.fogotPassword);
+router.get("/resetPassword/:id/:token", auth_controller.resetPassword);
+router.post("/resetPassword/:id/:token", auth_controller.postResetPassword);
 router.post(
   "/refreshToken",
   auth_middlewares.loginRequire,

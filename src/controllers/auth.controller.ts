@@ -14,6 +14,25 @@ export const auth_controller = {
     res.clearCookie("REFRESH_TOKEN");
     res.status(201).json({ message: "Success" });
   },
+  fogotPassword: async (req: Request, res: Response) => {
+    const { data, status } = await auth_services.fogotPassword(req.body);
+    return res.status(status).json(data);
+  },
+  resetPassword: async (req: Request, res: Response) => {
+    const { data, status } = await auth_services.resetPassword(
+      req.params.id,
+      req.params.token
+    );
+    return res.status(status).json(data);
+  },
+  postResetPassword: async (req: Request, res: Response) => {
+    const { data, status } = await auth_services.postResetPassword(
+      req.params.id,
+      req.params.token,
+      req.body
+    );
+    return res.status(status).json(data);
+  },
   refreshToken: async (req: Request, res: Response) => {
     const { data, status } = await auth_services.refreshToken(req);
     return res.status(status).json(data);

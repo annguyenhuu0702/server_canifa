@@ -7,6 +7,14 @@ export interface login {
   password: string;
 }
 
+export interface fogotPassword {
+  email: string;
+}
+
+export interface resetPassword {
+  password: string;
+}
+
 export interface typeAuth {
   user: any;
   accessToken: string;
