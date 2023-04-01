@@ -1,3 +1,4 @@
+import { ILike } from "typeorm";
 import { resData, resMessage, resType } from "../common/type";
 import { AppDataSource } from "../db";
 import { ProductVariant } from "../entities/ProductVariant";
@@ -68,10 +69,24 @@ export const productVariant_services = {
     query: getAllProductVariant
   ): Promise<resData<ProductVariant[]> | resMessage> => {
     try {
-      const { p, limit, productId } = query;
+      const { p, limit, productId, name, code } = query;
       const [productVariants, count] = await ProductVariant.findAndCount({
         where: {
           ...(productId ? { productId: +productId } : {}),
+          ...(name
+            ? {
+                product: {
+                  name: ILike(`%${name}%`),
+                },
+              }
+            : {}),
+          ...(code
+            ? {
+                product: {
+                  code: ILike(`%${code}%`),
+                },
+              }
+            : {}),
         },
         relations: {
           variantValues: true,

@@ -6,7 +6,6 @@ import { AppDataSource } from "../db";
 import { Collection } from "../entities/Collection";
 import { Product } from "../entities/Product";
 import { ProductCategory } from "../entities/ProductCategory";
-import { ProductVariant } from "../entities/ProductVariant";
 import {
   createProduct,
   getAllProduct,
@@ -107,7 +106,7 @@ export const product_services = {
     query: getAllProduct
   ): Promise<resData<Product[]> | resMessage> => {
     try {
-      const { p, limit, name, slug, otherSlug } = query;
+      const { p, limit, name, slug, otherSlug, sortBy, sortType } = query;
       const [data, count] = await Product.findAndCount({
         where: {
           ...(name
@@ -152,9 +151,7 @@ export const product_services = {
             variantValues: true,
           },
         },
-        order: {
-          createdAt: "DESC",
-        },
+        order: { [sortBy || "createdAt"]: sortType || "DESC" },
       });
       return {
         status: 200,

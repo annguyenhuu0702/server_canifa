@@ -15,5 +15,7 @@ export interface updateProductVariant {
 }
 
 export interface getAllProductVariant extends queryItems {
+  name?: string;
+  code?: string;
   productId: string;
 }
