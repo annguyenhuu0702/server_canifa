@@ -15,6 +15,7 @@ import {
   typeAuth,
 } from "../types/auth";
 import { cart_services } from "./cart.services";
+import sgMail from "@sendgrid/mail";
 
 export const auth_services = {
   createAccessToken: (obj: any) => {
@@ -176,6 +177,23 @@ export const auth_services = {
           expiresIn: "1h",
         }
       );
+
+      sgMail.setApiKey(process.env.SENDGRID_API_KEY || "super-serect");
+      const msg = {
+        to: oldUser.email,
+        from: "nguyenhuuan2727@gmail.com", // Use the email address or domain you verified above
+        subject: "Cập nhật mật khẩu mới",
+        text: `Cập nhật mật khẩu mới tại http://localhost:1603/reset-password/${oldUser.id}/${token}`,
+      };
+      sgMail.send(msg).then(
+        () => {},
+        (error) => {
+          console.error(error);
+          if (error.response) {
+            console.error(error.response.body);
+          }
+        }
+      );
       return {
         status: 200,
         data: {
@@ -196,7 +214,7 @@ export const auth_services = {
       };
     }
   },
-  resetPassword: async (id: string, token: string): Promise<any> => {
+  getEmailResetPassword: async (id: string, token: string): Promise<any> => {
     try {
       const oldUser = await User.findOne({
         where: {
@@ -231,39 +249,32 @@ export const auth_services = {
       };
     }
   },
-  postResetPassword: async (
-    id: string,
-    token: string,
-    body: resetPassword
-  ): Promise<any> => {
+  resetPassword: async (id: string, body: resetPassword): Promise<any> => {
     try {
       const { password } = body;
-      console.log(id, password);
-      // const { password } = body;
-      // const oldUser = await User.findOne({
-      //   where: {
-      //     id: parseInt(id),
-      //   },
-      // });
-      // if (!oldUser) {
-      //   return {
-      //     status: 404,
-      //     data: {
-      //       message: "User not exists!",
-      //     },
-      //   };
-      // }
-      // const serect = process.env.JWT_SERECT + oldUser.hash;
-      // const verify = jwt.verify(token, serect);
-      // const hash = await argon.hash(password);
-      // await User.update(
-      //   {
-      //     id: parseInt(id),
-      //   },
-      //   {
-      //     hash,
-      //   }
-      // );
+      const oldUser = await User.findOne({
+        where: {
+          id: parseInt(id),
+        },
+      });
+      if (!oldUser) {
+        return {
+          status: 404,
+          data: {
+            message: "User not exists!",
+          },
+        };
+      }
+
+      const hash = await argon.hash(password);
+      await User.update(
+        {
+          id: parseInt(id),
+        },
+        {
+          hash,
+        }
+      );
       return {
         status: 200,
         data: {

@@ -18,17 +18,16 @@ export const auth_controller = {
     const { data, status } = await auth_services.fogotPassword(req.body);
     return res.status(status).json(data);
   },
-  resetPassword: async (req: Request, res: Response) => {
-    const { data, status } = await auth_services.resetPassword(
+  getEmailResetPassword: async (req: Request, res: Response) => {
+    const { data, status } = await auth_services.getEmailResetPassword(
       req.params.id,
       req.params.token
     );
     return res.status(status).json(data);
   },
-  postResetPassword: async (req: Request, res: Response) => {
-    const { data, status } = await auth_services.postResetPassword(
+  resetPassword: async (req: Request, res: Response) => {
+    const { data, status } = await auth_services.resetPassword(
       req.params.id,
-      req.params.token,
       req.body
     );
     return res.status(status).json(data);
