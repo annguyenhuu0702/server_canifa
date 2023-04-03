@@ -6,6 +6,8 @@ export interface createProduct {
   slug: string;
   thumbnail: string;
   description: string;
+  material: string;
+  guide: string;
   price: number;
   priceSale: number;
 }

@@ -41,6 +41,12 @@ export class Product extends BaseEntity {
   @Column({ default: "" })
   description: string;
 
+  @Column({ default: "" })
+  material: string;
+
+  @Column({ default: "" })
+  guide: string;
+
   @Column()
   price: number;
 

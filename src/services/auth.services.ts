@@ -100,7 +100,7 @@ export const auth_services = {
       });
       if (!isEmail) {
         return {
-          status: 403,
+          status: 400,
           data: {
             message: "Email or password wrong!",
           },
@@ -109,7 +109,7 @@ export const auth_services = {
       const isPassword = await argon.verify(isEmail.hash, body.password);
       if (!isPassword) {
         return {
-          status: 403,
+          status: 400,
           data: {
             message: "Email or password wrong!",
           },
