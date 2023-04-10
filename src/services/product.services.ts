@@ -1,4 +1,4 @@
-import { ILike } from "typeorm";
+import { ILike, In, LessThan } from "typeorm";
 import { makeid } from "../common";
 import { resData, resMessage, resType } from "../common/type";
 import { getCloudinary } from "../config/configCloudinary";
@@ -12,8 +12,29 @@ import {
   getByCategory,
   updateProduct,
 } from "../types/product";
+import { Discount } from "../entities/Discount";
 
 export const product_services = {
+  updatePriceSale: async (products: Product[]) => {
+    const checkdiscount = await Discount.find({
+      where: {
+        endday: LessThan(new Date()),
+      },
+    });
+    return Promise.all(
+      products.map((product) =>
+        Product.save({
+          ...product,
+          priceSale:
+            checkdiscount.findIndex((discount) =>
+              discount.productsId.includes(product.id)
+            ) !== -1
+              ? 0
+              : product.priceSale,
+        })
+      )
+    );
+  },
   create: async (
     body: createProduct
   ): Promise<resType<Product> | resMessage> => {
@@ -157,7 +178,7 @@ export const product_services = {
         status: 200,
         data: {
           data: {
-            rows: data,
+            rows: await product_services.updatePriceSale(data),
             count,
           },
           message: "Success",
@@ -194,7 +215,7 @@ export const product_services = {
       return {
         status: 200,
         data: {
-          data: product,
+          data: (await product_services.updatePriceSale([product]))[0],
           message: "Success",
         },
       };
@@ -253,12 +274,18 @@ export const product_services = {
           });
         })
       );
-      const data = products.map((item) => {
+      const data: any = products.map((item) => {
         return {
           productCategory: item.length > 0 ? item[0].productCategory : null,
           products: item,
         };
       });
+
+      for (let i = 0; i < data.length; i++) {
+        let products = data[i].products;
+        products = await product_services.updatePriceSale(products);
+        data[i].products = products;
+      }
       const count = data.length;
       return {
         status: 200,
@@ -332,8 +359,10 @@ export const product_services = {
         status: 200,
         data: {
           data: {
-            product: product,
-            productsRelated,
+            product: (await product_services.updatePriceSale([product]))[0],
+            productsRelated: await product_services.updatePriceSale(
+              productsRelated
+            ),
           },
           message: "Success",
         },
