@@ -14,6 +14,7 @@ import cartItemRouter from "./cartItem.routes";
 import cartRouter from "./cart.routes";
 import favoriteProductRouter from "./favoriteProduct.routes";
 import discountRouter from "./discount.routes";
+import newsRouter from "./news.routes";
 
 const router = Router();
 router.use("/api/upload", uploadRouter);
@@ -31,5 +32,6 @@ router.use("/api/cartItem", cartItemRouter);
 router.use("/api/cart", cartRouter);
 router.use("/api/favoriteProduct", favoriteProductRouter);
 router.use("/api/discount", discountRouter);
+router.use("/api/news", newsRouter);
 
 export default router;
