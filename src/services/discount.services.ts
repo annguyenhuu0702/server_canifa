@@ -40,8 +40,10 @@ export const discount_services = {
           data[i].productsId
         );
         data[i].productCategories = productCategories;
+        data[i].productCategories = [
+          ...new Map(productCategories.map((m) => [m.id, m])).values(),
+        ];
       }
-
       return {
         status: 200,
         data: {

@@ -10,6 +10,10 @@ router.post(
   discount_controller.create
 );
 router.get("/getAll", auth_middlewares.verifyAdmin, discount_controller.getAll);
-router.delete("/:id", auth_middlewares.verifyAdmin, discount_controller.delete);
+router.delete(
+  "/delete/:id",
+  auth_middlewares.verifyAdmin,
+  discount_controller.delete
+);
 
 export default router;
