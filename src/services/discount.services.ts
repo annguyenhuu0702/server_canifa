@@ -3,7 +3,7 @@ import { resData, resMessage, resType } from "../common/type";
 import { AppDataSource } from "../db";
 import { Discount } from "../entities/Discount";
 import { ProductCategory } from "../entities/ProductCategory";
-import { createDiscount } from "../types/discount";
+import { createDiscount, getAllDiscount } from "../types/discount";
 import { Product } from "../entities/Product";
 
 interface ResDiscount extends Discount {
@@ -22,8 +22,10 @@ export const discount_services = {
     });
     return data.map((item) => item.productCategory);
   },
-  getAll: async (query: any): Promise<resData<ResDiscount[]> | resMessage> => {
-    const { name } = query;
+  getAll: async (
+    query: getAllDiscount
+  ): Promise<resData<ResDiscount[]> | resMessage> => {
+    const { name, p, limit } = query;
     try {
       const [data, count] = (await Discount.findAndCount({
         where: {
@@ -32,6 +34,11 @@ export const discount_services = {
                 name: ILike(`%${name}%`),
               }
             : {}),
+        },
+        ...(limit ? { take: parseInt(limit) } : {}),
+        ...(p && limit ? { skip: parseInt(limit) * (parseInt(p) - 1) } : {}),
+        order: {
+          id: "DESC",
         },
       })) as [ResDiscount[], number];
 

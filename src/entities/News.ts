@@ -16,11 +16,14 @@ export class News extends BaseEntity {
   @Column()
   userId: number;
 
-  @Column()
+  @Column({ default: "" })
   title: string;
 
-  @Column()
+  @Column({ default: "" })
   content: string;
+
+  @Column({ default: "" })
+  thumbnail: string;
 
   @CreateDateColumn()
   createdAt: Date;
