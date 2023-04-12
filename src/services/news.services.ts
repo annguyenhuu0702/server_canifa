@@ -167,4 +167,36 @@ export const news_services = {
       };
     }
   },
+  getBySlug: async (slug: string): Promise<resType<News> | resMessage> => {
+    try {
+      const news = await News.findOne({
+        where: {
+          slug,
+        },
+      });
+      if (!news) {
+        return {
+          status: 404,
+          data: {
+            message: "Not found!",
+          },
+        };
+      }
+      return {
+        status: 200,
+        data: {
+          data: news,
+          message: "Success",
+        },
+      };
+    } catch (error) {
+      console.log(error);
+      return {
+        status: 500,
+        data: {
+          message: "Error",
+        },
+      };
+    }
+  },
 };
