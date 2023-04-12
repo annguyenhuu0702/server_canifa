@@ -1,9 +1,10 @@
-import { ILike, In, LessThan } from "typeorm";
+import { ILike, LessThan } from "typeorm";
 import { makeid } from "../common";
 import { resData, resMessage, resType } from "../common/type";
 import { getCloudinary } from "../config/configCloudinary";
 import { AppDataSource } from "../db";
 import { Collection } from "../entities/Collection";
+import { Discount } from "../entities/Discount";
 import { Product } from "../entities/Product";
 import { ProductCategory } from "../entities/ProductCategory";
 import {
@@ -12,7 +13,6 @@ import {
   getByCategory,
   updateProduct,
 } from "../types/product";
-import { Discount } from "../entities/Discount";
 
 export const product_services = {
   updatePriceSale: async (products: Product[]) => {

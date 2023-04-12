@@ -2,8 +2,9 @@ import { queryItems } from "../common/type";
 
 type createNews = {
   title: string;
+  slug: string;
   content: string;
-  userId: number;
+  creator: string;
   thumbnail: string;
 };
 

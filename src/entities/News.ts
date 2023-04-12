@@ -13,11 +13,16 @@ export class News extends BaseEntity {
   @PrimaryGeneratedColumn()
   id: number;
 
-  @Column()
-  userId: number;
+  @Column({
+    default: "",
+  })
+  creator: string;
 
   @Column({ default: "" })
   title: string;
+
+  @Column({ default: "" })
+  slug: string;
 
   @Column({ default: "" })
   content: string;

@@ -1,5 +1,4 @@
 import { resData, resMessage, resType } from "../common/type";
-import { AppDataSource } from "../db";
 import { FavoriteProduct } from "../entities/LoveProduct";
 import {
   createFavoriteProduct,
