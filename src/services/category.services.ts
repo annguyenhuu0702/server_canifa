@@ -150,7 +150,6 @@ export const category_services = {
             : {}),
         },
       });
-
       return {
         status: 200,
         data: {

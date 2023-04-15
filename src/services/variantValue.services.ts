@@ -37,6 +37,7 @@ export const variantValue_services = {
         ...(limit ? { take: parseInt(limit) } : {}),
         ...(p && limit ? { skip: parseInt(limit) * (parseInt(p) - 1) } : {}),
         order: {
+          variantId: "DESC",
           createdAt: "DESC",
         },
         ...(variantName ? { variant: { name: variantName } } : {}),

@@ -9,7 +9,7 @@ export interface createProduct {
   material: string;
   guide: string;
   price: number;
-  priceSale: number;
+  // priceSale: number;
 }
 
 export interface updateProduct extends createProduct {}
