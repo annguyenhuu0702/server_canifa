@@ -12,4 +12,12 @@ export const variantValue_controller = {
     );
     return res.status(status).json(data);
   },
+  getAllColor: async (req: Request, res: Response) => {
+    const { data, status } = await variantValue_services.getAllColor(req.query);
+    return res.status(status).json(data);
+  },
+  getAllSize: async (req: Request, res: Response) => {
+    const { data, status } = await variantValue_services.getAllSize(req.query);
+    return res.status(status).json(data);
+  },
 };

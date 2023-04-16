@@ -9,5 +9,7 @@ router.post(
   variantValue_controller.create
 );
 router.get("/getAll", variantValue_controller.getAll);
+router.get("/getAllSize", variantValue_controller.getAllSize);
+router.get("/getAllColor", variantValue_controller.getAllColor);
 
 export default router;
