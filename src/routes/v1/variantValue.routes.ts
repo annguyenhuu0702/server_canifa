@@ -8,6 +8,16 @@ router.post(
   auth_middlewares.verifyAdmin,
   variantValue_controller.create
 );
+router.put(
+  "/update/:id",
+  auth_middlewares.verifyAdmin,
+  variantValue_controller.update
+);
+router.delete(
+  "/delete/:id",
+  auth_middlewares.verifyAdmin,
+  variantValue_controller.delete
+);
 router.get("/getAll", variantValue_controller.getAll);
 router.get("/getAllSize", variantValue_controller.getAllSize);
 router.get("/getAllColor", variantValue_controller.getAllColor);

@@ -1,7 +1,9 @@
 import { resData, resMessage, resType } from "../common/type";
+import { AppDataSource } from "../db";
 import { VariantValue } from "../entities/VariantValue";
 import {
   createVariantValue,
+  updateVariantValue,
   getAllColor,
   getAllVariantValue,
 } from "../types/variantValue";
@@ -19,6 +21,64 @@ export const variantValue_services = {
         data: {
           data: data,
           message: "Created success",
+        },
+      };
+    } catch (error) {
+      console.log(error);
+      return {
+        status: 500,
+        data: {
+          message: "Error",
+        },
+      };
+    }
+  },
+  update: async (id: string, body: updateVariantValue): Promise<resMessage> => {
+    try {
+      const data = await VariantValue.findOne({
+        where: {
+          id: parseInt(id),
+        },
+      });
+      if (!data) {
+        return {
+          status: 404,
+          data: {
+            message: "Not found",
+          },
+        };
+      }
+      await VariantValue.update(
+        {
+          id: parseInt(id),
+        },
+        body
+      );
+      return {
+        status: 200,
+        data: {
+          message: "update success",
+        },
+      };
+    } catch (error) {
+      console.log(error);
+      return {
+        status: 500,
+        data: {
+          message: "Error",
+        },
+      };
+    }
+  },
+  delete: async (id: string): Promise<resMessage> => {
+    try {
+      await AppDataSource.getRepository(VariantValue).softDelete({
+        id: parseInt(id),
+      });
+      return {
+        status: 200,
+        data: {
+          message: "Delete successfully",
         },
       };
     } catch (error) {
