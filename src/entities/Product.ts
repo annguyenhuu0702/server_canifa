@@ -14,6 +14,7 @@ import { FavoriteProduct } from "./LoveProduct";
 import { ProductCategory } from "./ProductCategory";
 import { ProductImage } from "./ProductImage";
 import { ProductVariant } from "./ProductVariant";
+import { Comment } from "./Comment";
 
 @Unique(["code"])
 @Entity()
@@ -73,4 +74,7 @@ export class Product extends BaseEntity {
 
   @OneToMany(() => FavoriteProduct, (e) => e.product)
   favoriteProducts: FavoriteProduct[];
+
+  @OneToMany(() => Comment, (e) => e.product)
+  comments: Comment[];
 }
