@@ -10,6 +10,7 @@ import {
   UpdateDateColumn,
 } from "typeorm";
 import { Product } from "./Product";
+import { User } from "./User";
 
 @Entity()
 export class Comment extends BaseEntity {
@@ -36,4 +37,7 @@ export class Comment extends BaseEntity {
 
   @ManyToOne(() => Product, (e) => e.comments)
   product: Product;
+
+  @ManyToOne(() => User, (e) => e.comments)
+  user: User;
 }

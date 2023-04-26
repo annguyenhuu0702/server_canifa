@@ -7,7 +7,9 @@ import {
   Unique,
   BaseEntity,
   DeleteDateColumn,
+  OneToMany,
 } from "typeorm";
+import { Comment } from "./Comment";
 
 @Unique(["email"])
 @Entity()
@@ -74,4 +76,7 @@ export class User extends BaseEntity {
 
   @DeleteDateColumn()
   deletedAt: Date;
+
+  @OneToMany(() => Comment, (e) => e.user)
+  comments: Comment[];
 }

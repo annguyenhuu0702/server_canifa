@@ -5,6 +5,7 @@ import { comment_controller } from "../../controllers/comment.controller";
 const router = Router();
 
 router.get("/getAll", auth_middlewares.loginRequire, comment_controller.getAll);
+router.get("/getByProduct/:productId", comment_controller.getByProduct);
 router.post(
   "/create",
   auth_middlewares.loginRequire,

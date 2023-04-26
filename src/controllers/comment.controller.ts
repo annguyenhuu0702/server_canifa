@@ -6,6 +6,12 @@ export const comment_controller = {
     const { data, status } = await comment_services.getAll();
     return res.status(status).json(data);
   },
+  getByProduct: async (req: Request, res: Response) => {
+    const { data, status } = await comment_services.getByProduct(
+      req.params.productId
+    );
+    return res.status(status).json(data);
+  },
   create: async (req: Request, res: Response) => {
     const { data, status } = await comment_services.create(
       req.body,

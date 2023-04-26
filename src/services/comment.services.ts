@@ -27,6 +27,44 @@ export const comment_services = {
       };
     }
   },
+  getByProduct: async (
+    productId: string
+  ): Promise<resData<any> | resMessage> => {
+    try {
+      const [data, count] = await Comment.findAndCount({
+        where: {
+          productId: parseInt(productId),
+        },
+        relations: {
+          user: true,
+        },
+      });
+
+      const newData = data.map((item) => {
+        const { hash, ...others } = item.user;
+        return { ...item, user: others };
+      });
+
+      return {
+        status: 200,
+        data: {
+          data: {
+            rows: newData,
+            count,
+          },
+          message: "success",
+        },
+      };
+    } catch (error) {
+      console.log(error);
+      return {
+        status: 500,
+        data: {
+          message: "Error",
+        },
+      };
+    }
+  },
   create: async (
     body: createComment,
     userId: number
