@@ -4,14 +4,23 @@ import { Comment } from "../entities/Comment";
 import { createComment, updateComment } from "../types/comment";
 
 export const comment_services = {
-  getAll: async (): Promise<resData<Comment[]> | resMessage> => {
+  getAll: async (): Promise<resData<any> | resMessage> => {
     try {
-      const [data, count] = await Comment.findAndCount();
+      const [data, count] = await Comment.findAndCount({
+        relations: {
+          user: true,
+        },
+      });
+
+      const newData = data.map((item) => {
+        const { hash, ...others } = item.user;
+        return { ...item, user: others };
+      });
       return {
         status: 200,
         data: {
           data: {
-            rows: data,
+            rows: newData,
             count,
           },
           message: "success",
