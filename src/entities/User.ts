@@ -10,6 +10,7 @@ import {
   OneToMany,
 } from "typeorm";
 import { Comment } from "./Comment";
+import { Payment } from "./Payment";
 
 @Unique(["email"])
 @Entity()
@@ -79,4 +80,7 @@ export class User extends BaseEntity {
 
   @OneToMany(() => Comment, (e) => e.user)
   comments: Comment[];
+
+  @OneToMany(() => Payment, (e) => e.user)
+  payments: Payment[];
 }
