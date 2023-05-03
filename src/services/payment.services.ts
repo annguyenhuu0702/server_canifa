@@ -1,15 +1,114 @@
-import { resMessage, resType } from "../common/type";
+import { resData, resMessage, resType } from "../common/type";
+import { AppDataSource } from "../db";
 import { Cart } from "../entities/Cart";
 import { CartItem } from "../entities/CartItem";
 import { Payment } from "../entities/Payment";
+import { PaymentItem } from "../entities/PaymentItem";
+import { ProductVariant } from "../entities/ProductVariant";
 import { User } from "../entities/User";
-import { createPayment } from "../types/payemnt";
+import { createPayment, getAllPayment, updatePayment } from "../types/payemnt";
 
 export const payment_services = {
-  create: async (
-    body: createPayment,
-    userId: number
-  ): Promise<resType<Payment> | resMessage> => {
+  getAll: async (
+    query: getAllPayment
+  ): Promise<resData<Payment[]> | resMessage> => {
+    try {
+      const { p, limit } = query;
+      const [data, count] = await Payment.findAndCount({
+        relations: {
+          paymentItems: true,
+        },
+        ...(limit ? { take: parseInt(limit) } : {}),
+        ...(p && limit ? { skip: parseInt(limit) * (parseInt(p) - 1) } : {}),
+        order: {
+          createdAt: "DESC",
+        },
+      });
+      return {
+        status: 200,
+        data: {
+          data: {
+            rows: data,
+            count,
+          },
+          message: "success",
+        },
+      };
+    } catch (error) {
+      console.log(error);
+      return {
+        status: 500,
+        data: {
+          message: "Error",
+        },
+      };
+    }
+  },
+  getByUser: async (id: string): Promise<resType<Payment> | resMessage> => {
+    try {
+      const data = await Payment.findOne({
+        where: {
+          id: parseInt(id),
+        },
+      });
+      if (!data) {
+        return {
+          status: 404,
+          data: {
+            message: "Not found",
+          },
+        };
+      }
+      return {
+        status: 200,
+        data: {
+          data: data,
+          message: "Success",
+        },
+      };
+    } catch (error) {
+      console.log(error);
+      return {
+        status: 500,
+        data: {
+          message: "Error",
+        },
+      };
+    }
+  },
+  getById: async (id: string): Promise<resType<Payment> | resMessage> => {
+    try {
+      const data = await Payment.findOne({
+        where: {
+          id: parseInt(id),
+        },
+      });
+      if (!data) {
+        return {
+          status: 404,
+          data: {
+            message: "Not found",
+          },
+        };
+      }
+      return {
+        status: 200,
+        data: {
+          data: data,
+          message: "Success",
+        },
+      };
+    } catch (error) {
+      console.log(error);
+      return {
+        status: 500,
+        data: {
+          message: "Error",
+        },
+      };
+    }
+  },
+  create: async (body: createPayment, userId: number): Promise<any> => {
     try {
       const cart = await Cart.findOne({
         where: {
@@ -35,15 +134,20 @@ export const payment_services = {
 
         const data = await Payment.save({
           ...payemnt,
-          paymentItems: cartItem.map((item) => ({
+        });
+
+        const paymentItems = await AppDataSource.getRepository(
+          PaymentItem
+        ).save(
+          cartItem.map((item) => ({
             productVariantId: item.productVariantId,
             price:
               item.productVariant.product.priceSale ||
               item.productVariant.product.price,
-            paymentId: payemnt.id,
+            paymentId: data.id,
             quantity: item.quantity,
-          })),
-        });
+          }))
+        );
 
         await CartItem.delete({
           cartId: cart.id,
@@ -69,7 +173,8 @@ export const payment_services = {
         return {
           status: 201,
           data: {
-            data: data,
+            data,
+            paymentItems,
             message: "Created success",
           },
         };
@@ -84,5 +189,69 @@ export const payment_services = {
         message: "Error",
       },
     };
+  },
+  update: async (id: string, body: updatePayment): Promise<resMessage> => {
+    try {
+      await Payment.update(
+        {
+          id: parseInt(id),
+        },
+        body
+      );
+
+      const paymentItems = await PaymentItem.find({
+        where: {
+          paymentId: parseInt(id),
+        },
+        relations: {
+          productVariant: true,
+        },
+      });
+
+      if (body.status === "Đã giao hàng") {
+        await AppDataSource.getRepository(ProductVariant).save(
+          paymentItems.map((item) => ({
+            ...item.productVariant,
+            inventory: item.productVariant.inventory - item.quantity,
+          }))
+        );
+      }
+      return {
+        status: 200,
+        data: {
+          message: "Update successfully",
+        },
+      };
+    } catch (error) {
+      console.log(error);
+      return {
+        status: 500,
+        data: {
+          message: "Error",
+        },
+      };
+    }
+  },
+
+  delete: async (id: string): Promise<resMessage> => {
+    try {
+      await AppDataSource.getRepository(Payment).softDelete({
+        id: parseInt(id),
+      });
+      return {
+        status: 200,
+        data: {
+          message: "Delete successfully",
+        },
+      };
+    } catch (error) {
+      console.log(error);
+      return {
+        status: 500,
+        data: {
+          message: "Error",
+        },
+      };
+    }
   },
 };

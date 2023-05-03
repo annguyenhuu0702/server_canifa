@@ -8,7 +8,6 @@ import {
   PrimaryGeneratedColumn,
   UpdateDateColumn,
 } from "typeorm";
-import { Cart } from "./Cart";
 import { Payment } from "./Payment";
 import { ProductVariant } from "./ProductVariant";
 

@@ -1,3 +1,5 @@
+import { queryItems } from "../common/type";
+
 type createPayment = {
   fullname: string;
   phone: string;
@@ -11,4 +13,12 @@ type createPayment = {
   totalPrice: number;
 };
 
-export type { createPayment };
+type updatePayment = createPayment & {
+  status: string;
+};
+
+type getAllPayment = queryItems & {
+  title?: string;
+};
+
+export type { createPayment, updatePayment, getAllPayment };

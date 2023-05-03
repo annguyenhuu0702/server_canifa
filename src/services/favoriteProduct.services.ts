@@ -61,10 +61,7 @@ export const favoriteProduct_services = {
       };
     }
   },
-  delete: async (
-    productId: string,
-    userId: number
-  ): Promise<resType<any> | resMessage> => {
+  delete: async (productId: string, userId: number): Promise<resMessage> => {
     try {
       await FavoriteProduct.delete({
         productId: parseInt(productId),
@@ -73,7 +70,6 @@ export const favoriteProduct_services = {
       return {
         status: 200,
         data: {
-          data: "",
           message: "deleted success",
         },
       };
