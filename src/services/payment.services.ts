@@ -1,4 +1,5 @@
-import { resData, resMessage, resType } from "../common/type";
+import { ILike } from "typeorm";
+import { queryItems, resData, resMessage, resType } from "../common/type";
 import { AppDataSource } from "../db";
 import { Cart } from "../entities/Cart";
 import { CartItem } from "../entities/CartItem";
@@ -13,8 +14,20 @@ export const payment_services = {
     query: getAllPayment
   ): Promise<resData<Payment[]> | resMessage> => {
     try {
-      const { p, limit } = query;
+      const { p, limit, phone, fullname } = query;
       const [data, count] = await Payment.findAndCount({
+        where: {
+          ...(fullname
+            ? {
+                fullname: ILike(`%${fullname}%`),
+              }
+            : {}),
+          ...(phone
+            ? {
+                phone: ILike(`%${phone}%`),
+              }
+            : {}),
+        },
         relations: {
           paymentItems: true,
         },
@@ -44,11 +57,23 @@ export const payment_services = {
       };
     }
   },
-  getByUser: async (id: string): Promise<resType<Payment> | resMessage> => {
+  getByUser: async (
+    userId: number,
+    query: getAllPayment
+  ): Promise<resData<Payment[]> | resMessage> => {
     try {
-      const data = await Payment.findOne({
+      const { p, limit } = query;
+      const [data, count] = await Payment.findAndCount({
         where: {
-          id: parseInt(id),
+          userId,
+        },
+        relations: {
+          paymentItems: true,
+        },
+        ...(limit ? { take: parseInt(limit) } : {}),
+        ...(p && limit ? { skip: parseInt(limit) * (parseInt(p) - 1) } : {}),
+        order: {
+          createdAt: "DESC",
         },
       });
       if (!data) {
@@ -62,7 +87,10 @@ export const payment_services = {
       return {
         status: 200,
         data: {
-          data: data,
+          data: {
+            rows: data,
+            count,
+          },
           message: "Success",
         },
       };

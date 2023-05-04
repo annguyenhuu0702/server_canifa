@@ -18,7 +18,8 @@ type updatePayment = createPayment & {
 };
 
 type getAllPayment = queryItems & {
-  title?: string;
+  fullname?: string;
+  phone?: string;
 };
 
 export type { createPayment, updatePayment, getAllPayment };

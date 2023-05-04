@@ -10,6 +10,11 @@ router.get(
   auth_middlewares.verifyAdmin,
   payment_controller.getById
 );
+router.get(
+  "/getByUser",
+  auth_middlewares.loginRequire,
+  payment_controller.getByUser
+);
 router.post(
   "/create",
   auth_middlewares.loginRequire,

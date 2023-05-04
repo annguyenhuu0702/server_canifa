@@ -10,6 +10,13 @@ export const payment_controller = {
     const { data, status } = await payment_services.getById(req.params.id);
     return res.status(status).json(data);
   },
+  getByUser: async (req: Request, res: Response) => {
+    const { data, status } = await payment_services.getByUser(
+      res.locals.user.id,
+      req.query
+    );
+    return res.status(status).json(data);
+  },
   create: async (req: Request, res: Response) => {
     const { data, status } = await payment_services.create(
       req.body,

@@ -377,4 +377,54 @@ export const product_services = {
       };
     }
   },
+
+  getHomePage: async (): Promise<resType<any> | resMessage> => {
+    try {
+      const tshirt = await Product.find({
+        where: {
+          productCategoryId: 37,
+        },
+        take: 4,
+        relations: {
+          productCategory: true,
+          productImages: true,
+          productVariants: {
+            variantValues: true,
+          },
+        },
+      });
+
+      const short = await Product.find({
+        where: {
+          productCategoryId: 70,
+        },
+        take: 4,
+        relations: {
+          productCategory: true,
+          productImages: true,
+          productVariants: {
+            variantValues: true,
+          },
+        },
+      });
+      return {
+        status: 200,
+        data: {
+          data: {
+            tshirt: await product_services.updatePriceSale(tshirt),
+            short: await product_services.updatePriceSale(short),
+          },
+          message: "Success",
+        },
+      };
+    } catch (error) {
+      console.log(error);
+      return {
+        status: 500,
+        data: {
+          message: "Error",
+        },
+      };
+    }
+  },
 };

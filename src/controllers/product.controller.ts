@@ -36,4 +36,9 @@ export const product_controller = {
     const { data, status } = await product_services.getBySlug(req.params.slug);
     return res.status(status).json(data);
   },
+
+  getHomePage: async (req: Request, res: Response) => {
+    const { data, status } = await product_services.getHomePage();
+    return res.status(status).json(data);
+  },
 };
