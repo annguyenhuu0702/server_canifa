@@ -35,4 +35,11 @@ export const payment_controller = {
     const { data, status } = await payment_services.delete(req.params.id);
     return res.status(status).json(data);
   },
+  checkPoint: async (req: Request, res: Response) => {
+    const { data, status } = await payment_services.checkPoint(
+      req.body.point,
+      res.locals.user.id
+    );
+    return res.status(status).json(data);
+  },
 };

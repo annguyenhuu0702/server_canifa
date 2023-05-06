@@ -243,6 +243,31 @@ export const payment_services = {
             inventory: item.productVariant.inventory - item.quantity,
           }))
         );
+
+        const payemnt = await Payment.findOne({
+          where: {
+            id: parseInt(id),
+          },
+        });
+
+        if (payemnt) {
+          const checkUser = await User.findOne({
+            where: {
+              id: payemnt.userId,
+            },
+          });
+          if (checkUser) {
+            const data = await AppDataSource.getRepository(User).update(
+              {
+                id: checkUser.id,
+              },
+              {
+                accumulatedPoints:
+                  checkUser.accumulatedPoints + body.totalPrice / 1000,
+              }
+            );
+          }
+        }
       }
       return {
         status: 200,
@@ -281,5 +306,43 @@ export const payment_services = {
         },
       };
     }
+  },
+
+  checkPoint: async (point: number, userId: number): Promise<resMessage> => {
+    try {
+      const user = await User.findOne({
+        where: {
+          id: userId,
+        },
+      });
+      if (user) {
+        if (point > user?.accumulatedPoints) {
+          return {
+            status: 400,
+            data: {
+              message: "Điểm tích lũy của bạn không đủ!",
+            },
+          };
+        }
+      }
+      if (user) {
+        if (point <= user?.accumulatedPoints) {
+          return {
+            status: 200,
+            data: {
+              message: "Success",
+            },
+          };
+        }
+      }
+    } catch (error) {
+      console.log(error);
+    }
+    return {
+      status: 500,
+      data: {
+        message: "Error",
+      },
+    };
   },
 };

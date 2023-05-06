@@ -33,4 +33,10 @@ router.delete(
   payment_controller.delete
 );
 
+router.post(
+  "/check-point",
+  auth_middlewares.loginRequire,
+  payment_controller.checkPoint
+);
+
 export default router;
