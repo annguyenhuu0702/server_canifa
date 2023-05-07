@@ -3,7 +3,7 @@ import { comment_services } from "../services/comment.services";
 
 export const comment_controller = {
   getAll: async (req: Request, res: Response) => {
-    const { data, status } = await comment_services.getAll();
+    const { data, status } = await comment_services.getAll(req.query);
     return res.status(status).json(data);
   },
   getByProduct: async (req: Request, res: Response) => {

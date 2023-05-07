@@ -1,3 +1,5 @@
+import { queryItems } from "../common/type";
+
 type createComment = {
   content: string;
   productId: number;
@@ -5,4 +7,8 @@ type createComment = {
 
 type updateComment = createComment & {};
 
-export type { createComment, updateComment };
+type getAllComment = queryItems & {
+  fullname?: string;
+};
+
+export type { createComment, updateComment, getAllComment };

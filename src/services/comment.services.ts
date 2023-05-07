@@ -1,14 +1,30 @@
+import { ILike } from "typeorm";
 import { resData, resMessage, resType } from "../common/type";
 import { AppDataSource } from "../db";
 import { Comment } from "../entities/Comment";
-import { createComment, updateComment } from "../types/comment";
+import { createComment, getAllComment, updateComment } from "../types/comment";
 
 export const comment_services = {
-  getAll: async (): Promise<resData<any> | resMessage> => {
+  getAll: async (query: getAllComment): Promise<resData<any> | resMessage> => {
     try {
+      const { p, limit, fullname } = query;
       const [data, count] = await Comment.findAndCount({
+        where: {
+          ...(fullname
+            ? {
+                user: {
+                  fullname: ILike(`%${fullname}%`),
+                },
+              }
+            : {}),
+        },
         relations: {
           user: true,
+        },
+        ...(limit ? { take: parseInt(limit) } : {}),
+        ...(p && limit ? { skip: parseInt(limit) * (parseInt(p) - 1) } : {}),
+        order: {
+          createdAt: "DESC",
         },
       });
 
@@ -46,6 +62,9 @@ export const comment_services = {
         },
         relations: {
           user: true,
+        },
+        order: {
+          createdAt: "DESC",
         },
       });
 
