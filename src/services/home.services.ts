@@ -50,7 +50,7 @@ export const admin_services = {
               path: "/admin/news",
             },
             {
-              text: "Khuyến mãi mãi",
+              text: "Khuyến mãi",
               count: countPromotion,
               path: "/admin/discount",
             },

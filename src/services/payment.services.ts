@@ -1,5 +1,6 @@
 import { ILike } from "typeorm";
-import { queryItems, resData, resMessage, resType } from "../common/type";
+import { lastDay } from "../common";
+import { resData, resMessage, resType } from "../common/type";
 import { AppDataSource } from "../db";
 import { Cart } from "../entities/Cart";
 import { CartItem } from "../entities/CartItem";
@@ -8,7 +9,6 @@ import { PaymentItem } from "../entities/PaymentItem";
 import { ProductVariant } from "../entities/ProductVariant";
 import { User } from "../entities/User";
 import { createPayment, getAllPayment, updatePayment } from "../types/payemnt";
-import { lastDay } from "../common";
 
 export const payment_services = {
   getAll: async (
@@ -390,10 +390,7 @@ export const payment_services = {
     }
   },
 
-  getRevenueYear: async (query: {
-    // month?: string;
-    year?: string;
-  }): Promise<any> => {
+  getRevenueYear: async (query: { year?: string }): Promise<any> => {
     const { year } = query;
 
     try {
