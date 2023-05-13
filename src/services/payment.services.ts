@@ -8,6 +8,7 @@ import { PaymentItem } from "../entities/PaymentItem";
 import { ProductVariant } from "../entities/ProductVariant";
 import { User } from "../entities/User";
 import { createPayment, getAllPayment, updatePayment } from "../types/payemnt";
+import { lastDay } from "../common";
 
 export const payment_services = {
   getAll: async (
@@ -344,5 +345,89 @@ export const payment_services = {
         message: "Error",
       },
     };
+  },
+  getRevenueMonth: async (query: {
+    month?: string;
+    year?: string;
+  }): Promise<any> => {
+    const { month, year } = query;
+
+    try {
+      const data = await AppDataSource.getRepository(Payment)
+        .createQueryBuilder("p")
+        .groupBy(`date_part('day',"p"."updatedAt")`)
+        .addGroupBy(`date_part('month',"p"."updatedAt")`)
+        .addGroupBy(`date_part('year',"p"."updatedAt")`)
+        .select(`sum("p"."totalPrice")`, "total")
+        .addSelect(`date_part('day',"p"."updatedAt")`, "day")
+        .addSelect(`date_part('month',"p"."updatedAt")`, "month")
+        .addSelect(`date_part('year',"p"."updatedAt")`, "year")
+        .where(`"p"."updatedAt" between :start and :end`, {
+          start: new Date(`${year}-${month}-01`),
+          end: new Date(`${year}-${month}-${lastDay(+`${month}`, +`${year}`)}`),
+        })
+        .andWhere(`"p"."status"=:status`, {
+          status: "Đã giao hàng",
+        })
+        .orderBy(`date_part('day',"p"."updatedAt")`, "ASC")
+        .getRawMany();
+
+      return {
+        status: 200,
+        data: {
+          data: data,
+          message: "Success",
+        },
+      };
+    } catch (error) {
+      console.log(error);
+      return {
+        status: 500,
+        data: {
+          message: "Error",
+        },
+      };
+    }
+  },
+
+  getRevenueYear: async (query: {
+    // month?: string;
+    year?: string;
+  }): Promise<any> => {
+    const { year } = query;
+
+    try {
+      const data = await AppDataSource.getRepository(Payment)
+        .createQueryBuilder("p")
+        .groupBy(`date_part('month',"p"."updatedAt")`)
+        .addGroupBy(`date_part('year',"p"."updatedAt")`)
+        .select(`sum("p"."totalPrice")`, "total")
+        .addSelect(`date_part('month',"p"."updatedAt")`, "month")
+        .addSelect(`date_part('year',"p"."updatedAt")`, "year")
+        .where(`date_part('year',"p"."updatedAt")=:year`, {
+          year: year,
+        })
+        .andWhere(`"p"."status"=:status`, {
+          status: "Đã giao hàng",
+        })
+        .orderBy(`date_part('month',"p"."updatedAt")`, "ASC")
+        .getRawMany();
+
+      return {
+        status: 200,
+        data: {
+          data: data,
+          message: "Success",
+        },
+      };
+    } catch (error) {
+      console.log(error);
+      return {
+        status: 500,
+        data: {
+          message: "Error",
+        },
+      };
+    }
   },
 };

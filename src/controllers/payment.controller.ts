@@ -42,4 +42,14 @@ export const payment_controller = {
     );
     return res.status(status).json(data);
   },
+
+  getRevenueMonth: async (req: Request, res: Response) => {
+    const { data, status } = await payment_services.getRevenueMonth(req.query);
+    return res.status(status).json(data);
+  },
+
+  getRevenueYear: async (req: Request, res: Response) => {
+    const { data, status } = await payment_services.getRevenueYear(req.query);
+    return res.status(status).json(data);
+  },
 };

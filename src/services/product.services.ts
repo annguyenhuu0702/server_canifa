@@ -394,9 +394,9 @@ export const product_services = {
         },
       });
 
-      const short = await Product.find({
+      const poloMan = await Product.find({
         where: {
-          productCategoryId: 70,
+          productCategoryId: 63,
         },
         take: 4,
         relations: {
@@ -412,7 +412,7 @@ export const product_services = {
         data: {
           data: {
             tshirt: await product_services.updatePriceSale(tshirt),
-            short: await product_services.updatePriceSale(short),
+            short: await product_services.updatePriceSale(poloMan),
           },
           message: "Success",
         },

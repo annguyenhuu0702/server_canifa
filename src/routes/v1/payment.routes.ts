@@ -39,4 +39,16 @@ router.post(
   payment_controller.checkPoint
 );
 
+router.get(
+  "/revenue-month",
+  auth_middlewares.verifyAdmin,
+  payment_controller.getRevenueMonth
+);
+
+router.get(
+  "/revenue-year",
+  auth_middlewares.verifyAdmin,
+  payment_controller.getRevenueYear
+);
+
 export default router;

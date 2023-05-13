@@ -12,7 +12,11 @@ export const admin_services = {
       const countComment = await Comment.count();
       const countNews = await News.count();
       const countPromotion = await Discount.count();
-      const orders = await Payment.find();
+      const orders = await Payment.find({
+        where: {
+          status: "Đã giao hàng",
+        },
+      });
       const totalPrice = orders.reduce((prev, curr) => {
         return prev + curr.totalPrice;
       }, 0);
@@ -46,7 +50,7 @@ export const admin_services = {
               path: "/admin/news",
             },
             {
-              text: "Khuyễn mãi",
+              text: "Khuyến mãi mãi",
               count: countPromotion,
               path: "/admin/discount",
             },
