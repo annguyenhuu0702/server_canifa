@@ -1,4 +1,11 @@
-import { ILike, LessThan } from "typeorm";
+import {
+  Between,
+  ILike,
+  In,
+  LessThan,
+  LessThanOrEqual,
+  MoreThanOrEqual,
+} from "typeorm";
 import { makeid } from "../common";
 import { resData, resMessage, resType } from "../common/type";
 import { getCloudinary } from "../config/configCloudinary";
@@ -21,17 +28,61 @@ export const product_services = {
         endday: LessThan(new Date()),
       },
     });
-    return Promise.all(
+
+    // code lúc trước
+    // return Promise.all(
+    //   products.map((product) =>
+    //     Product.save({
+    //       ...product,
+    //       priceSale:
+    //         checkdiscount.findIndex((discount) =>
+    //           discount.productsId.includes(product.id)
+    //         ) !== -1
+    //           ? 0
+    //           : product.priceSale,
+    //     })
+    //   )
+    // );
+
+    // code mới
+    await Promise.all(
       products.map((product) =>
-        Product.save({
-          ...product,
-          priceSale:
-            checkdiscount.findIndex((discount) =>
-              discount.productsId.includes(product.id)
-            ) !== -1
-              ? 0
-              : product.priceSale,
-        })
+        Product.update(
+          {
+            id: product.id,
+          },
+          {
+            // ...product,
+            priceSale:
+              checkdiscount.findIndex((discount) =>
+                discount.productsId.includes(product.id)
+              ) !== -1
+                ? 0
+                : product.priceSale,
+          }
+        )
+      )
+    );
+    return Promise.all(
+      products.map(
+        (product) =>
+          Product.findOne({
+            where: {
+              id: product.id,
+            },
+            relations: {
+              productCategory: {
+                collection: {
+                  category: true,
+                },
+              },
+              productImages: true,
+              productVariants: {
+                product: true,
+                variantValues: true,
+              },
+            },
+          }) as any
       )
     );
   },
@@ -127,8 +178,21 @@ export const product_services = {
     query: getAllProduct
   ): Promise<resData<Product[]> | resMessage> => {
     try {
-      const { p, limit, name, slug, otherSlug, sortBy, sortType } = query;
-      const [data, count] = await Product.findAndCount({
+      const {
+        p,
+        limit,
+        name,
+        slug,
+        otherSlug,
+        sortBy,
+        sortType,
+        min,
+        max,
+        colorsId,
+        sizesId,
+      } = query;
+
+      let [data, count] = await Product.findAndCount({
         where: {
           ...(name
             ? {
@@ -161,14 +225,63 @@ export const product_services = {
                 ],
               }
             : {}),
+          ...(min && !max
+            ? {
+                price: MoreThanOrEqual(+min),
+              }
+            : {}),
+
+          ...(max && !min
+            ? {
+                price: LessThanOrEqual(+max),
+              }
+            : {}),
+
+          ...(min && max
+            ? {
+                price: Between(+min, +max),
+              }
+            : {}),
+          ...(colorsId || sizesId
+            ? {
+                productVariants: {
+                  variantValues: {
+                    id: In(
+                      [
+                        ...(colorsId || "").split(","),
+                        ...(sizesId || "").split(","),
+                      ].map((item) => +item)
+                    ),
+                  },
+                },
+              }
+            : {}),
         },
         withDeleted: false,
+        // ...(limit ? { take: parseInt(limit) } : {}),
+        // ...(p && limit ? { skip: parseInt(limit) * (parseInt(p) - 1) } : {}),
+        relations: {
+          productCategory: true,
+          productImages: true,
+          productVariants: {
+            product: true,
+            variantValues: true,
+          },
+        },
+        // order: { [sortBy || "createdAt"]: sortType || "DESC" },
+      });
+
+      data = await Product.find({
+        where: {
+          id: In(data.map((item) => item.id)),
+        },
         ...(limit ? { take: parseInt(limit) } : {}),
         ...(p && limit ? { skip: parseInt(limit) * (parseInt(p) - 1) } : {}),
         relations: {
           productCategory: true,
           productImages: true,
           productVariants: {
+            product: true,
             variantValues: true,
           },
         },

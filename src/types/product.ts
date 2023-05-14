@@ -18,6 +18,10 @@ export interface getAllProduct extends queryItems {
   name?: string;
   slug?: string;
   otherSlug?: string;
+  min?: string;
+  max?: string;
+  sizesId?: string;
+  colorsId?: string;
 }
 
 export interface getByCategory {
