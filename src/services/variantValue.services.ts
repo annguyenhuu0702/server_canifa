@@ -1,3 +1,4 @@
+import { ILike } from "typeorm";
 import { resData, resMessage, resType } from "../common/type";
 import { AppDataSource } from "../db";
 import { VariantValue } from "../entities/VariantValue";
@@ -130,11 +131,17 @@ export const variantValue_services = {
     query: getAllColor
   ): Promise<resData<VariantValue[]> | resMessage> => {
     try {
-      const { p, limit } = query;
+      const { p, limit, name } = query;
       const [colors, count] = await VariantValue.findAndCount({
         where: {
           variantId: 2,
+          ...(name
+            ? {
+                name: ILike(`${name}%`),
+              }
+            : {}),
         },
+
         withDeleted: false,
         ...(limit ? { take: parseInt(limit) } : {}),
         ...(p && limit ? { skip: parseInt(limit) * (parseInt(p) - 1) } : {}),
@@ -166,10 +173,15 @@ export const variantValue_services = {
     query: getAllColor
   ): Promise<resData<VariantValue[]> | resMessage> => {
     try {
-      const { p, limit } = query;
+      const { p, limit, name } = query;
       const [sizes, count] = await VariantValue.findAndCount({
         where: {
           variantId: 1,
+          ...(name
+            ? {
+                name: ILike(`${name}%`),
+              }
+            : {}),
         },
         withDeleted: false,
         ...(limit ? { take: parseInt(limit) } : {}),

@@ -258,7 +258,7 @@ export const payment_services = {
             },
           });
           if (checkUser) {
-            const data = await AppDataSource.getRepository(User).update(
+            await AppDataSource.getRepository(User).update(
               {
                 id: checkUser.id,
               },
