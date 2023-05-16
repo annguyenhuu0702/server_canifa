@@ -52,4 +52,14 @@ export const payment_controller = {
     const { data, status } = await payment_services.getRevenueYear(req.query);
     return res.status(status).json(data);
   },
+
+  create_url: async (req: Request, res: Response) => {
+    const { data } = await payment_services.create_url(req.query);
+    return res.json(data);
+  },
+
+  // vnpay_return: async (req: Request, res: Response) => {
+  //   const { data } = await payment_services.vnpay_return(req.query);
+  //   return res.json(data);
+  // },
 };

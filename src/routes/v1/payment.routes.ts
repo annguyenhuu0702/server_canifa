@@ -51,4 +51,7 @@ router.get(
   payment_controller.getRevenueYear
 );
 
+router.get("/create_url", payment_controller.create_url);
+// router.get("/vnpay_return", payment_controller.vnpay_return);
+
 export default router;

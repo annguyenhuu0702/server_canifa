@@ -1,5 +1,5 @@
 import { ILike } from "typeorm";
-import { lastDay } from "../common";
+import { lastDay, makeid } from "../common";
 import { resData, resMessage, resType } from "../common/type";
 import { AppDataSource } from "../db";
 import { Cart } from "../entities/Cart";
@@ -9,6 +9,9 @@ import { PaymentItem } from "../entities/PaymentItem";
 import { ProductVariant } from "../entities/ProductVariant";
 import { User } from "../entities/User";
 import { createPayment, getAllPayment, updatePayment } from "../types/payemnt";
+import moment from "moment";
+import qs from "qs";
+import crypto from "crypto";
 
 export const payment_services = {
   getAll: async (
@@ -427,4 +430,73 @@ export const payment_services = {
       };
     }
   },
+
+  sortObject: (obj: any) => {
+    let sorted: any = {};
+    let str = [];
+    let key;
+    for (key in obj) {
+      if (obj.hasOwnProperty(key)) {
+        str.push(encodeURIComponent(key));
+      }
+    }
+    str.sort();
+    for (key = 0; key < str.length; key++) {
+      sorted[str[key]] = encodeURIComponent(obj[str[key]]).replace(/%20/g, "+");
+    }
+    return sorted;
+  },
+
+  create_url: async (q: any) => {
+    let { amount } = q;
+    let secretKey = process.env.vnp_HashSecret;
+    let vnpUrl = process.env.vnp_Url;
+    let vnp_ReturnUrl = process.env.vnp_ReturnUrl;
+    let query: any = payment_services.sortObject({
+      vnp_Amount: amount * 100,
+      vnp_Command: "pay",
+      vnp_CreateDate: parseInt(moment().format("YYYYMMDDHHmmss")),
+      vnp_CurrCode: "VND",
+      vnp_IpAddr: "27.71.108.110",
+      vnp_Locale: "vn",
+      vnp_OrderInfo: "Thanh toan don hang",
+      vnp_OrderType: "other",
+      vnp_ReturnUrl: vnp_ReturnUrl,
+      vnp_TmnCode: process.env.vnp_TmnCode,
+      vnp_TxnRef: parseInt(moment().format("YYYYMMDDHHmmss")),
+      vnp_Version: "2.1.0",
+    });
+    // Sign sha256
+    let signData = qs.stringify(query, { encode: false });
+    let hmac = crypto.createHmac("sha512", secretKey || "");
+    let signed = hmac.update(new Buffer(signData, "utf-8")).digest("hex");
+    query["vnp_SecureHash"] = signed;
+    return {
+      data: vnpUrl + "?" + qs.stringify(query, { encode: false }),
+    };
+  },
+
+  // vnpay_return: async (query: any) => {
+  //   let vnp_Params = query;
+  //   let secureHash = vnp_Params["vnp_SecureHash"];
+  //   delete vnp_Params["vnp_SecureHash"];
+  //   delete vnp_Params["vnp_SecureHashType"];
+  //   vnp_Params = payment_services.sortObject(vnp_Params);
+  //   let tmnCode = process.env.vnp_TmnCode;
+  //   let secretKey = process.env.vnp_HashSecret;
+  //   let querystring = require("qs");
+  //   let signData = querystring.stringify(vnp_Params, { encode: false });
+  //   let crypto = require("crypto");
+  //   let hmac = crypto.createHmac("sha512", secretKey);
+  //   let signed = hmac.update(new Buffer(signData, "utf-8")).digest("hex");
+  //   if (secureHash === signed) {
+  //     return {
+  //       data: "http://localhost:1603/payment-success",
+  //     };
+  //   } else {
+  //     return {
+  //       data: "http://localhost:1603/payment-success",
+  //     };
+  //   }
+  // },
 };
