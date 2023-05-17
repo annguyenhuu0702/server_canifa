@@ -38,6 +38,9 @@ export class Payment extends BaseEntity {
   @Column({ default: 1 })
   payment: number;
 
+  @Column({ default: false })
+  isPaid: boolean;
+
   @Column({ default: "Chờ xử lí" })
   status: string;
 

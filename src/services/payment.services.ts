@@ -142,12 +142,14 @@ export const payment_services = {
   },
   create: async (body: createPayment, userId: number): Promise<any> => {
     try {
+      // lấy giỏ hàng theo userId
       const cart = await Cart.findOne({
         where: {
           userId,
         },
       });
 
+      // tìm cart item trong cart
       if (cart) {
         const cartItem = await CartItem.find({
           where: {
@@ -159,6 +161,8 @@ export const payment_services = {
             },
           },
         });
+
+        // tạo đơn hàng
         const payemnt = await Payment.create({
           ...body,
           userId,
@@ -181,6 +185,7 @@ export const payment_services = {
           }))
         );
 
+        // xóa cartItem khi đặt hàng
         await CartItem.delete({
           cartId: cart.id,
         });
@@ -240,7 +245,16 @@ export const payment_services = {
         },
       });
 
+      // đã giao hàng thì trừ số lượng tồn, cập nhật điểm cho user
       if (body.status === "Đã giao hàng") {
+        await Payment.update(
+          {
+            id: parseInt(id),
+          },
+          {
+            isPaid: true,
+          }
+        );
         await AppDataSource.getRepository(ProductVariant).save(
           paymentItems.map((item) => ({
             ...item.productVariant,

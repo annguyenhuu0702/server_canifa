@@ -9,6 +9,7 @@ type createPayment = {
   street: string;
   payment: number;
   point: number;
+  isPaid: boolean;
   shippingCost: number;
   totalPrice: number;
 };
