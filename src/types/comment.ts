@@ -2,6 +2,7 @@ import { queryItems } from "../common/type";
 
 type createComment = {
   content: string;
+  rating: number;
   productId: number;
 };
 

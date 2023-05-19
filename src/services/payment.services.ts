@@ -33,7 +33,11 @@ export const payment_services = {
             : {}),
         },
         relations: {
-          paymentItems: true,
+          paymentItems: {
+            productVariant: {
+              product: true,
+            },
+          },
         },
         ...(limit ? { take: parseInt(limit) } : {}),
         ...(p && limit ? { skip: parseInt(limit) * (parseInt(p) - 1) } : {}),

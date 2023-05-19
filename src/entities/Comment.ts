@@ -26,6 +26,9 @@ export class Comment extends BaseEntity {
   @Column()
   content: string;
 
+  @Column()
+  rating: number;
+
   @CreateDateColumn()
   createdAt: Date;
 
