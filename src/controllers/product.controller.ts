@@ -41,4 +41,19 @@ export const product_controller = {
     const { data, status } = await product_services.getHomePage();
     return res.status(status).json(data);
   },
+
+  getProductStar: async (req: Request, res: Response) => {
+    const { data, status } = await product_services.getProductStar();
+    return res.status(status).json(data);
+  },
+
+  getProductSale: async (req: Request, res: Response) => {
+    const { data, status } = await product_services.getProductSale();
+    return res.status(status).json(data);
+  },
+
+  getProductSelling: async (req: Request, res: Response) => {
+    const { data, status } = await product_services.getProductSelling();
+    return res.status(status).json(data);
+  },
 };

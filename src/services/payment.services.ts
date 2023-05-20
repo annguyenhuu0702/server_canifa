@@ -18,7 +18,7 @@ export const payment_services = {
     query: getAllPayment
   ): Promise<resData<Payment[]> | resMessage> => {
     try {
-      const { p, limit, phone, fullname } = query;
+      const { p, limit, phone, fullname, status } = query;
       const [data, count] = await Payment.findAndCount({
         where: {
           ...(fullname
@@ -29,6 +29,12 @@ export const payment_services = {
           ...(phone
             ? {
                 phone: ILike(`%${phone}%`),
+              }
+            : {}),
+
+          ...(status
+            ? {
+                status: ILike(`%${status}%`),
               }
             : {}),
         },

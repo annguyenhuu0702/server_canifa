@@ -21,6 +21,7 @@ type updatePayment = createPayment & {
 type getAllPayment = queryItems & {
   fullname?: string;
   phone?: string;
+  status?: string;
 };
 
 export type { createPayment, updatePayment, getAllPayment };

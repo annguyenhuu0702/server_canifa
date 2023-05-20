@@ -3,6 +3,7 @@ import { resData, resMessage, resType } from "../common/type";
 import { AppDataSource } from "../db";
 import { Comment } from "../entities/Comment";
 import { createComment, getAllComment, updateComment } from "../types/comment";
+import { product_services } from "./product.services";
 
 export const comment_services = {
   getAll: async (query: getAllComment): Promise<resData<any> | resMessage> => {
@@ -102,6 +103,7 @@ export const comment_services = {
         userId,
         ...body,
       });
+      await product_services.updateStar(body.productId);
       return {
         status: 201,
         data: {
@@ -127,6 +129,8 @@ export const comment_services = {
         },
         body
       );
+      await product_services.updateStar(body.productId);
+
       return {
         status: 201,
         data: {
@@ -145,9 +149,17 @@ export const comment_services = {
   },
   delete: async (id: string): Promise<resMessage> => {
     try {
-      await AppDataSource.getRepository(Comment).softDelete({
-        id: parseInt(id),
+      const data = await Comment.findOne({
+        where: {
+          id: parseInt(id),
+        },
       });
+      if (data) {
+        await AppDataSource.getRepository(Comment).softDelete({
+          id: parseInt(id),
+        });
+        await product_services.updateStar(data.productId);
+      }
       return {
         status: 200,
         data: {

@@ -36,6 +36,9 @@ export class Product extends BaseEntity {
   @Column()
   slug: string;
 
+  @Column({ default: 0 })
+  totalStar: number;
+
   @Column({ default: "" })
   thumbnail: string;
 

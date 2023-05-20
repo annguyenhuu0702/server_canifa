@@ -4,6 +4,7 @@ import {
   In,
   LessThan,
   LessThanOrEqual,
+  MoreThan,
   MoreThanOrEqual,
 } from "typeorm";
 import { makeid } from "../common";
@@ -20,8 +21,30 @@ import {
   getByCategory,
   updateProduct,
 } from "../types/product";
+import { Comment } from "../entities/Comment";
 
 export const product_services = {
+  updateStar: async (productId: number) => {
+    try {
+      const [comments, count] = await Comment.findAndCount({
+        where: {
+          productId,
+        },
+      });
+
+      await Product.update(
+        {
+          id: productId,
+        },
+        {
+          totalStar: comments.reduce((prev, acc) => prev + acc.rating, 0),
+        }
+      );
+    } catch (error) {
+      console.log(error);
+    }
+  },
+
   updatePriceSale: async (products: Product[]) => {
     const checkdiscount = await Discount.find({
       where: {
@@ -287,6 +310,7 @@ export const product_services = {
         },
         order: { [sortBy || "createdAt"]: sortType || "DESC" },
       });
+
       return {
         status: 200,
         data: {
@@ -532,6 +556,86 @@ export const product_services = {
       };
     } catch (error) {
       console.log(error);
+      return {
+        status: 500,
+        data: {
+          message: "Error",
+        },
+      };
+    }
+  },
+
+  getProductStar: async (): Promise<resData<Product[]> | resMessage> => {
+    const [data, count] = await Product.findAndCount({
+      where: {
+        totalStar: MoreThan(0),
+      },
+      take: 10,
+      order: {
+        totalStar: "DESC",
+      },
+    });
+    try {
+      return {
+        status: 200,
+        data: {
+          data: {
+            rows: data,
+            count,
+          },
+          message: "Success",
+        },
+      };
+    } catch (error) {
+      return {
+        status: 500,
+        data: {
+          message: "Error",
+        },
+      };
+    }
+  },
+
+  getProductSale: async (): Promise<resData<Product[]> | resMessage> => {
+    const [data, count] = await Product.findAndCount({
+      where: {
+        priceSale: MoreThan(0),
+      },
+    });
+    try {
+      return {
+        status: 200,
+        data: {
+          data: {
+            rows: await product_services.updatePriceSale(data),
+            count,
+          },
+          message: "Success",
+        },
+      };
+    } catch (error) {
+      return {
+        status: 500,
+        data: {
+          message: "Error",
+        },
+      };
+    }
+  },
+
+  getProductSelling: async (): Promise<resData<Product[]> | resMessage> => {
+    try {
+      return {
+        status: 200,
+        data: {
+          data: {
+            rows: null,
+            count: 0,
+          },
+          message: "Success",
+        },
+      };
+    } catch (error) {
       return {
         status: 500,
         data: {
