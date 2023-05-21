@@ -22,6 +22,7 @@ import {
   updateProduct,
 } from "../types/product";
 import { Comment } from "../entities/Comment";
+import { PaymentItem } from "../entities/PaymentItem";
 
 export const product_services = {
   updateStar: async (productId: number) => {
@@ -570,6 +571,13 @@ export const product_services = {
       where: {
         totalStar: MoreThan(0),
       },
+      relations: {
+        productCategory: true,
+        productImages: true,
+        productVariants: {
+          variantValues: true,
+        },
+      },
       take: 10,
       order: {
         totalStar: "DESC",
@@ -601,6 +609,13 @@ export const product_services = {
       where: {
         priceSale: MoreThan(0),
       },
+      relations: {
+        productCategory: true,
+        productImages: true,
+        productVariants: {
+          variantValues: true,
+        },
+      },
     });
     try {
       return {
@@ -625,17 +640,52 @@ export const product_services = {
 
   getProductSelling: async (): Promise<resData<Product[]> | resMessage> => {
     try {
+      let data = await AppDataSource.getRepository(PaymentItem)
+        .createQueryBuilder("items")
+        .leftJoinAndSelect("items.productVariant", "pv")
+        .leftJoinAndSelect("pv.product", "pr")
+        .leftJoinAndSelect("items.payment", "p")
+        .groupBy("pr.id")
+        .select("sum(items.quantity)", "total")
+        .addSelect("pr.id", "id")
+        .where("p.status=:status", {
+          status: "Đã giao hàng",
+        })
+        .orderBy("sum(items.quantity)", "DESC")
+        .getRawMany();
+      data = data.splice(0, 10);
+      for (let i = 0; i < data.length; i++) {
+        let newData = await Product.findOne({
+          where: {
+            id: data[i].id,
+          },
+          relations: {
+            productCategory: true,
+            productImages: true,
+            productVariants: {
+              variantValues: true,
+            },
+          },
+        });
+
+        data[i] = {
+          ...data[i],
+          ...newData,
+        };
+      }
+
       return {
         status: 200,
         data: {
           data: {
-            rows: null,
+            rows: data,
             count: 0,
           },
           message: "Success",
         },
       };
     } catch (error) {
+      console.log(error);
       return {
         status: 500,
         data: {
