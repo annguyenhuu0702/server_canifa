@@ -588,7 +588,7 @@ export const product_services = {
         status: 200,
         data: {
           data: {
-            rows: data,
+            rows: await product_services.updatePriceSale(data),
             count,
           },
           message: "Success",
@@ -622,7 +622,7 @@ export const product_services = {
         status: 200,
         data: {
           data: {
-            rows: await product_services.updatePriceSale(data),
+            rows: data,
             count,
           },
           message: "Success",
@@ -678,7 +678,7 @@ export const product_services = {
         status: 200,
         data: {
           data: {
-            rows: data,
+            rows: await product_services.updatePriceSale(data),
             count: 0,
           },
           message: "Success",
