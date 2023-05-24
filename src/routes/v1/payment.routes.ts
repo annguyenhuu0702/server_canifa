@@ -5,6 +5,7 @@ import { auth_middlewares } from "../../middlewares/auth.middleware";
 const router = Router();
 
 router.get("/getAll", payment_controller.getAll);
+router.get("/getAllPaymentItem", payment_controller.getAllPaymentItem);
 router.get(
   "/getById/:id",
   auth_middlewares.verifyAdmin,

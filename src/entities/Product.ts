@@ -51,6 +51,9 @@ export class Product extends BaseEntity {
   @Column({ default: "" })
   guide: string;
 
+  @Column({ default: false })
+  isActive: boolean;
+
   @Column()
   price: number;
 

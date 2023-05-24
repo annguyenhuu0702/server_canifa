@@ -144,7 +144,6 @@ export const product_services = {
       },
       body
     );
-
     await Product.save({
       ...item,
       ...body,
@@ -199,6 +198,141 @@ export const product_services = {
     }
   },
   getAll: async (
+    query: getAllProduct
+  ): Promise<resData<Product[]> | resMessage> => {
+    try {
+      const {
+        p,
+        limit,
+        name,
+        slug,
+        otherSlug,
+        sortBy,
+        sortType,
+        min,
+        max,
+        colorsId,
+        sizesId,
+      } = query;
+
+      let [data, count] = await Product.findAndCount({
+        where: {
+          isActive: false,
+          ...(name
+            ? {
+                name: ILike(`%${name}%`),
+              }
+            : {}),
+          ...(slug
+            ? {
+                slug,
+              }
+            : {}),
+          ...(otherSlug
+            ? {
+                productCategory: [
+                  {
+                    slug: otherSlug,
+                  },
+                  {
+                    collection: {
+                      slug: otherSlug,
+                    },
+                  },
+                  {
+                    collection: {
+                      category: {
+                        slug: otherSlug,
+                      },
+                    },
+                  },
+                ],
+              }
+            : {}),
+          ...(min && !max
+            ? {
+                price: MoreThanOrEqual(+min),
+              }
+            : {}),
+
+          ...(max && !min
+            ? {
+                price: LessThanOrEqual(+max),
+              }
+            : {}),
+
+          ...(min && max
+            ? {
+                price: Between(+min, +max),
+              }
+            : {}),
+          ...(colorsId || sizesId
+            ? {
+                productVariants: {
+                  variantValues: {
+                    id: In(
+                      [
+                        ...(colorsId || "").split(","),
+                        ...(sizesId || "").split(","),
+                      ].map((item) => +item)
+                    ),
+                  },
+                },
+              }
+            : {}),
+        },
+        withDeleted: false,
+        // ...(limit ? { take: parseInt(limit) } : {}),
+        // ...(p && limit ? { skip: parseInt(limit) * (parseInt(p) - 1) } : {}),
+        relations: {
+          productCategory: true,
+          productImages: true,
+          productVariants: {
+            product: true,
+            variantValues: true,
+          },
+        },
+        // order: { [sortBy || "createdAt"]: sortType || "DESC" },
+      });
+
+      data = await Product.find({
+        where: {
+          id: In(data.map((item) => item.id)),
+        },
+        ...(limit ? { take: parseInt(limit) } : {}),
+        ...(p && limit ? { skip: parseInt(limit) * (parseInt(p) - 1) } : {}),
+        relations: {
+          productCategory: true,
+          productImages: true,
+          productVariants: {
+            product: true,
+            variantValues: true,
+          },
+        },
+        order: { [sortBy || "createdAt"]: sortType || "DESC" },
+      });
+
+      return {
+        status: 200,
+        data: {
+          data: {
+            rows: await product_services.updatePriceSale(data),
+            count,
+          },
+          message: "Success",
+        },
+      };
+    } catch (error) {
+      console.log(error);
+      return {
+        status: 500,
+        data: {
+          message: "Error",
+        },
+      };
+    }
+  },
+  getAllAdmin: async (
     query: getAllProduct
   ): Promise<resData<Product[]> | resMessage> => {
     try {
@@ -337,6 +471,7 @@ export const product_services = {
       const product = await Product.findOne({
         where: {
           id: parseInt(id),
+          isActive: false,
         },
         relations: {
           productCategory: true,
@@ -400,6 +535,7 @@ export const product_services = {
           return Product.find({
             where: {
               productCategoryId: item ? item.id : 0,
+              isActive: false,
             },
             relations: {
               productCategory: true,
@@ -454,6 +590,7 @@ export const product_services = {
       const product = await Product.findOne({
         where: {
           slug,
+          isActive: false,
         },
         relations: {
           productCategory: {
@@ -479,6 +616,7 @@ export const product_services = {
       const productsRelated = await Product.find({
         where: {
           productCategoryId: product.productCategory.id,
+          isActive: false,
         },
         take: 4,
         relations: {
@@ -521,6 +659,7 @@ export const product_services = {
       const tshirt = await Product.find({
         where: {
           productCategoryId: 37,
+          isActive: false,
         },
         take: 4,
         relations: {
@@ -535,6 +674,7 @@ export const product_services = {
       const poloMan = await Product.find({
         where: {
           productCategoryId: 63,
+          isActive: false,
         },
         take: 4,
         relations: {
@@ -570,6 +710,7 @@ export const product_services = {
     const [data, count] = await Product.findAndCount({
       where: {
         totalStar: MoreThan(0),
+        isActive: false,
       },
       relations: {
         productCategory: true,
@@ -608,6 +749,7 @@ export const product_services = {
     const [data, count] = await Product.findAndCount({
       where: {
         priceSale: MoreThan(0),
+        isActive: false,
       },
       relations: {
         productCategory: true,
@@ -622,7 +764,7 @@ export const product_services = {
         status: 200,
         data: {
           data: {
-            rows: data,
+            rows: await product_services.updatePriceSale(data),
             count,
           },
           message: "Success",
@@ -650,6 +792,9 @@ export const product_services = {
         .addSelect("pr.id", "id")
         .where("p.status=:status", {
           status: "Đã giao hàng",
+        })
+        .andWhere("pr.isActive=:isActive", {
+          isActive: false,
         })
         .orderBy("sum(items.quantity)", "DESC")
         .getRawMany();
@@ -682,6 +827,33 @@ export const product_services = {
             count: 0,
           },
           message: "Success",
+        },
+      };
+    } catch (error) {
+      console.log(error);
+      return {
+        status: 500,
+        data: {
+          message: "Error",
+        },
+      };
+    }
+  },
+
+  activeProduct: async (id: string, isActive: boolean): Promise<any> => {
+    try {
+      await Product.update(
+        {
+          id: parseInt(id),
+        },
+        {
+          isActive,
+        }
+      );
+      return {
+        status: 200,
+        data: {
+          message: "update successfully",
         },
       };
     } catch (error) {

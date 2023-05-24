@@ -14,6 +14,64 @@ import qs from "qs";
 import crypto from "crypto";
 
 export const payment_services = {
+  getAllPaymentItem: async (): Promise<resData<Payment[]> | resMessage> => {
+    try {
+      // const data = await Payment.find({
+      //   where: [
+      //     {
+      //       status: "Chờ xử lí",
+      //     },
+      //     {
+      //       status: "Đang giao hàng",
+      //     },
+      //     {
+      //       status: "Đã xác nhận",
+      //     },
+      //   ],
+      // });
+      const [data, count] = await Payment.findAndCount({
+        where: [
+          {
+            status: "Chờ xử lí",
+          },
+          {
+            status: "Đang giao hàng",
+          },
+          {
+            status: "Đã xác nhận",
+          },
+        ],
+        relations: {
+          paymentItems: {
+            productVariant: {
+              product: true,
+            },
+          },
+        },
+        order: {
+          createdAt: "DESC",
+        },
+      });
+      return {
+        status: 200,
+        data: {
+          data: {
+            rows: data,
+            count,
+          },
+          message: "success",
+        },
+      };
+    } catch (error) {
+      console.log(error);
+      return {
+        status: 500,
+        data: {
+          message: "Error",
+        },
+      };
+    }
+  },
   getAll: async (
     query: getAllPayment
   ): Promise<resData<Payment[]> | resMessage> => {

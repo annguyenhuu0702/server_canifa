@@ -21,6 +21,10 @@ export const product_controller = {
     const { data, status } = await product_services.getAll(req.query);
     return res.status(status).json(data);
   },
+  getAllAdmin: async (req: Request, res: Response) => {
+    const { data, status } = await product_services.getAllAdmin(req.query);
+    return res.status(status).json(data);
+  },
   getById: async (req: Request, res: Response) => {
     const { data, status } = await product_services.getById(req.params.id);
     return res.status(status).json(data);
@@ -54,6 +58,14 @@ export const product_controller = {
 
   getProductSelling: async (req: Request, res: Response) => {
     const { data, status } = await product_services.getProductSelling();
+    return res.status(status).json(data);
+  },
+
+  activeProduct: async (req: Request, res: Response) => {
+    const { data, status } = await product_services.activeProduct(
+      req.params.id,
+      req.body.isActive
+    );
     return res.status(status).json(data);
   },
 };

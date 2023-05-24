@@ -2,6 +2,10 @@ import { Request, Response } from "express";
 import { payment_services } from "../services/payment.services";
 
 export const payment_controller = {
+  getAllPaymentItem: async (req: Request, res: Response) => {
+    const { data, status } = await payment_services.getAllPaymentItem();
+    return res.status(status).json(data);
+  },
   getAll: async (req: Request, res: Response) => {
     const { data, status } = await payment_services.getAll(req.query);
     return res.status(status).json(data);
