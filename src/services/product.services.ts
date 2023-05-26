@@ -522,9 +522,12 @@ export const product_services = {
 
       const productsCategory = await Promise.all(
         collections.map((item) => {
-          return ProductCategory.findOne({
+          return ProductCategory.find({
             where: {
               collectionId: item.id,
+            },
+            order: {
+              createdAt: "ASC",
             },
           });
         })
@@ -534,7 +537,7 @@ export const product_services = {
         productsCategory.map((item) => {
           return Product.find({
             where: {
-              productCategoryId: item ? item.id : 0,
+              productCategoryId: item && item.length > 0 ? item[0].id : 0,
               isActive: false,
             },
             relations: {
