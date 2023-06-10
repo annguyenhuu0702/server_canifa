@@ -4,6 +4,11 @@ import { auth_middlewares } from "../../middlewares/auth.middleware";
 
 const router = Router();
 router.get(
+  "/getProductFavorite",
+  // auth_middlewares.loginRequire,
+  favoriteProduct_controller.getProductFavorite
+);
+router.get(
   "/getAll",
   auth_middlewares.loginRequire,
   favoriteProduct_controller.getAll

@@ -28,4 +28,11 @@ export const favoriteProduct_controller = {
     );
     return res.status(status).json(data);
   },
+
+  getProductFavorite: async (req: Request, res: Response) => {
+    const { data, status } = await favoriteProduct_services.getProductFavorite(
+      req.body
+    );
+    return res.status(status).json(data);
+  },
 };

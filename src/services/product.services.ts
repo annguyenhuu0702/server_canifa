@@ -23,6 +23,7 @@ import {
 } from "../types/product";
 import { Comment } from "../entities/Comment";
 import { PaymentItem } from "../entities/PaymentItem";
+import { FavoriteProduct } from "../entities/LoveProduct";
 
 export const product_services = {
   updateStar: async (productId: number) => {

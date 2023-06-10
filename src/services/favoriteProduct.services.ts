@@ -1,5 +1,7 @@
+import { In } from "typeorm";
 import { resData, resMessage, resType } from "../common/type";
 import { FavoriteProduct } from "../entities/LoveProduct";
+import { Product } from "../entities/Product";
 import {
   createFavoriteProduct,
   getAllFavoriteProduct,
@@ -109,6 +111,62 @@ export const favoriteProduct_services = {
         data: {
           data: {
             rows: data,
+            count,
+          },
+          message: "success",
+        },
+      };
+    } catch (error) {
+      console.log(error);
+      return {
+        status: 500,
+        data: {
+          message: "Error",
+        },
+      };
+    }
+  },
+
+  // lấy sản phẩm yêu thích liên quan hiển ra trang chủ
+  getProductFavorite: async (
+    id: string
+  ): Promise<resData<Product[]> | resMessage> => {
+    try {
+      const data = await FavoriteProduct.find({
+        where: {
+          userId: 4,
+        },
+        relations: {
+          product: {
+            productVariants: {
+              variantValues: true,
+            },
+            productImages: true,
+          },
+        },
+      });
+
+      const product_category_id = data.map(
+        (item) => item.product.productCategoryId
+      );
+
+      const [products, count] = await Product.findAndCount({
+        where: {
+          productCategoryId: In(product_category_id),
+        },
+        relations: {
+          productVariants: {
+            variantValues: true,
+          },
+          productImages: true,
+        },
+      });
+
+      return {
+        status: 200,
+        data: {
+          data: {
+            rows: products,
             count,
           },
           message: "success",
