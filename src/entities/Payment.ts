@@ -44,7 +44,9 @@ export class Payment extends BaseEntity {
   @Column({ default: "Chờ xử lí" })
   status: string;
 
-  @Column()
+  @Column({
+    nullable: true,
+  })
   userId: number;
 
   @Column({ default: 0 })

@@ -28,6 +28,10 @@ export const payment_controller = {
     );
     return res.status(status).json(data);
   },
+  createNoLogin: async (req: Request, res: Response) => {
+    const { data, status } = await payment_services.createNoLogin(req.body);
+    return res.status(status).json(data);
+  },
   update: async (req: Request, res: Response) => {
     const { data, status } = await payment_services.update(
       req.params.id,

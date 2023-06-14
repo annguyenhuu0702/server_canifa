@@ -22,6 +22,8 @@ router.post(
   payment_controller.create
 );
 
+router.post("/create-nologin", payment_controller.createNoLogin);
+
 router.put(
   "/update/:id",
   auth_middlewares.loginRequire,

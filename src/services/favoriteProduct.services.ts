@@ -134,7 +134,7 @@ export const favoriteProduct_services = {
     try {
       const data = await FavoriteProduct.find({
         where: {
-          userId: 4,
+          userId: 30,
         },
         relations: {
           product: {

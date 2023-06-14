@@ -295,6 +295,40 @@ export const payment_services = {
       },
     };
   },
+
+  // đặt hàng ko đăng nhập
+  createNoLogin: async (body: any): Promise<any> => {
+    const { productVariant, quantity, ...others } = body;
+    try {
+      const order = await Payment.save({
+        ...others,
+      });
+      if (order) {
+        await PaymentItem.save({
+          paymentId: order.id,
+          productVariantId: productVariant.id,
+          price:
+            productVariant.product.priceSale || productVariant.product.price,
+          quantity,
+        });
+      }
+      return {
+        status: 201,
+        data: {
+          message: "Created success",
+        },
+      };
+    } catch (error) {
+      console.log(error);
+    }
+
+    return {
+      status: 500,
+      data: {
+        message: "Error",
+      },
+    };
+  },
   update: async (id: string, body: updatePayment): Promise<resMessage> => {
     try {
       await Payment.update(
