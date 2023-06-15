@@ -3,6 +3,8 @@ import { product_controller } from "../../controllers/product.controller";
 import { auth_middlewares } from "../../middlewares/auth.middleware";
 
 const router = Router();
+router.get("/search-product", product_controller.searchProduct);
+
 router.post("/create", auth_middlewares.verifyAdmin, product_controller.create);
 router.put(
   "/update/:id",

@@ -19,3 +19,7 @@ export interface getAllProductVariant extends queryItems {
   code?: string;
   productId: string;
 }
+
+export interface updateProductStock {
+  inventory: number;
+}

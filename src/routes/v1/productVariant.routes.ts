@@ -14,5 +14,15 @@ router.put(
   productVariant_controller.update
 );
 router.get("/getAll", productVariant_controller.getAll);
+router.get(
+  "/getAllProductOutOfStock",
+  productVariant_controller.getAllProductOutOfStock
+);
+
+router.put(
+  "/updateInventory/:id",
+  auth_middlewares.verifyAdmin,
+  productVariant_controller.updateInventory
+);
 
 export default router;

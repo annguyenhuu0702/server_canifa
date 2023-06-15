@@ -17,4 +17,18 @@ export const productVariant_controller = {
     );
     return res.status(status).json(data);
   },
+
+  getAllProductOutOfStock: async (req: Request, res: Response) => {
+    const { data, status } =
+      await productVariant_services.getAllProductOutOfStock(req.query as any);
+    return res.status(status).json(data);
+  },
+
+  updateInventory: async (req: Request, res: Response) => {
+    const { data, status } = await productVariant_services.updateInventory(
+      req.params.id,
+      req.body
+    );
+    return res.status(status).json(data);
+  },
 };

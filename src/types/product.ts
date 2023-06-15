@@ -28,3 +28,7 @@ export interface getByCategory {
   limitCollection?: string;
   limitProduct?: string;
 }
+
+export interface searchProduct extends queryItems {
+  keyword?: string;
+}

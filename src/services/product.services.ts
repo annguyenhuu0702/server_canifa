@@ -19,11 +19,16 @@ import {
   createProduct,
   getAllProduct,
   getByCategory,
+  searchProduct,
   updateProduct,
 } from "../types/product";
 import { Comment } from "../entities/Comment";
 import { PaymentItem } from "../entities/PaymentItem";
 import { FavoriteProduct } from "../entities/LoveProduct";
+import { Client } from "@elastic/elasticsearch";
+
+let events = require("events");
+events.EventEmitter.defaultMaxListeners = 100;
 
 export const product_services = {
   updateStar: async (productId: number) => {
@@ -858,6 +863,87 @@ export const product_services = {
         status: 200,
         data: {
           message: "update successfully",
+        },
+      };
+    } catch (error) {
+      console.log(error);
+      return {
+        status: 500,
+        data: {
+          message: "Error",
+        },
+      };
+    }
+  },
+
+  searchProduct: async (query: searchProduct): Promise<any> => {
+    const { keyword } = query;
+    const client = new Client({
+      cloud: {
+        id: "DATN:dXMtY2VudHJhbDEuZ2NwLmNsb3VkLmVzLmlvOjQ0MyQ2OTJjODU3YWYwYzU0NzhhOGVjY2YyMWI4MGU4YTY5NCQwNDQ1OWE2NTcyYmI0ZGExYTRjNzU3NmEzMTIzZmZhNg==",
+      },
+      auth: {
+        username: "elastic",
+        password: "jA4Lwj1ld76A5JsmWwgmo7md",
+      },
+    });
+    try {
+      const data = await Product.find({
+        where: {
+          isActive: false,
+        },
+        relations: {
+          productCategory: true,
+          productImages: true,
+          productVariants: {
+            variantValues: true,
+          },
+        },
+      });
+
+      if (data) {
+        const fetchData = async () => {
+          await Promise.all(
+            data.map((item) =>
+              client.index({
+                index: "product",
+                document: {
+                  ...item,
+                },
+              })
+            )
+          );
+        };
+        await fetchData();
+      }
+
+      const result = await client.search({
+        index: "product",
+        query: {
+          match: {
+            name: keyword,
+          },
+        },
+      });
+
+      const uniqueData: any[] = [];
+      const uniqueIds = new Set();
+
+      result.hits.hits.forEach((hit: any) => {
+        const source = hit._source;
+        if (!uniqueIds.has(source.id)) {
+          uniqueIds.add(source.id);
+          uniqueData.push(source);
+        }
+      });
+      return {
+        status: 200,
+        data: {
+          data: {
+            rows: uniqueData,
+            count: uniqueData.length,
+          },
+          message: "success",
         },
       };
     } catch (error) {
