@@ -1,4 +1,4 @@
-import { ILike, LessThan, MoreThan } from "typeorm";
+import { ILike, LessThan } from "typeorm";
 import { resData, resMessage, resType } from "../common/type";
 import { AppDataSource } from "../db";
 import { ProductVariant } from "../entities/ProductVariant";
@@ -125,7 +125,7 @@ export const productVariant_services = {
       const { p, limit, productId, name, code } = query;
       const [productVariants, count] = await ProductVariant.findAndCount({
         where: {
-          inventory: LessThan(35),
+          inventory: LessThan(40),
           ...(productId ? { productId: +productId } : {}),
           ...(name
             ? {

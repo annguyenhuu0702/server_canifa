@@ -120,7 +120,38 @@ export const product_services = {
     body: createProduct
   ): Promise<resType<Product> | resMessage> => {
     try {
+      const client = new Client({
+        cloud: {
+          id: "DATN:dXMtY2VudHJhbDEuZ2NwLmNsb3VkLmVzLmlvOjQ0MyQ2OTJjODU3YWYwYzU0NzhhOGVjY2YyMWI4MGU4YTY5NCQwNDQ1OWE2NTcyYmI0ZGExYTRjNzU3NmEzMTIzZmZhNg==",
+        },
+        auth: {
+          username: "elastic",
+          password: "jA4Lwj1ld76A5JsmWwgmo7md",
+        },
+      });
       const product = await Product.save({ ...body, code: makeid(9) });
+      const newData = await Product.findOne({
+        where: {
+          id: product.id,
+        },
+        relations: {
+          productCategory: true,
+          productImages: true,
+          productVariants: {
+            product: true,
+            variantValues: true,
+          },
+        },
+      });
+
+      client.index({
+        index: "productv3",
+        id: `${newData?.id}`,
+        document: {
+          ...newData,
+        },
+      });
+
       return {
         status: 201,
         data: {
@@ -150,10 +181,45 @@ export const product_services = {
       },
       body
     );
-    await Product.save({
+    const newProduct = await Product.save({
       ...item,
       ...body,
     });
+
+    const newData = await Product.findOne({
+      where: {
+        id: newProduct.id,
+      },
+      relations: {
+        productCategory: true,
+        productImages: true,
+        productVariants: {
+          product: true,
+          variantValues: true,
+        },
+      },
+    });
+
+    const client = new Client({
+      cloud: {
+        id: "DATN:dXMtY2VudHJhbDEuZ2NwLmNsb3VkLmVzLmlvOjQ0MyQ2OTJjODU3YWYwYzU0NzhhOGVjY2YyMWI4MGU4YTY5NCQwNDQ1OWE2NTcyYmI0ZGExYTRjNzU3NmEzMTIzZmZhNg==",
+      },
+      auth: {
+        username: "elastic",
+        password: "jA4Lwj1ld76A5JsmWwgmo7md",
+      },
+    });
+
+    if (newData) {
+      client.update({
+        index: "productv3",
+        id: `${newData.id}`,
+        doc: {
+          ...newData,
+        },
+      });
+    }
+
     try {
       return {
         status: 200,
@@ -220,6 +286,22 @@ export const product_services = {
         colorsId,
         sizesId,
       } = query;
+
+      const client = new Client({
+        cloud: {
+          id: "DATN:dXMtY2VudHJhbDEuZ2NwLmNsb3VkLmVzLmlvOjQ0MyQ2OTJjODU3YWYwYzU0NzhhOGVjY2YyMWI4MGU4YTY5NCQwNDQ1OWE2NTcyYmI0ZGExYTRjNzU3NmEzMTIzZmZhNg==",
+        },
+        auth: {
+          username: "elastic",
+          password: "jA4Lwj1ld76A5JsmWwgmo7md",
+        },
+      });
+
+      // await client.indices.delete({
+      //   index: "product",
+      // });
+
+      // await client.indices.refresh({ index: "product" });
 
       let [data, count] = await Product.findAndCount({
         where: {
@@ -300,6 +382,23 @@ export const product_services = {
         },
         // order: { [sortBy || "createdAt"]: sortType || "DESC" },
       });
+
+      // if (data) {
+      //   const fetchData = async () => {
+      //     await Promise.all(
+      //       data.map((item) =>
+      //         client.index({
+      //           index: "productv3",
+      //           id: `${item.id}`,
+      //           document: {
+      //             ...item,
+      //           },
+      //         })
+      //       )
+      //     );
+      //   };
+      //   await fetchData();
+      // }
 
       data = await Product.find({
         where: {
@@ -856,9 +955,43 @@ export const product_services = {
           id: parseInt(id),
         },
         {
-          isActive,
+          isActive: true,
         }
       );
+
+      const newData = await Product.findOne({
+        where: {
+          id: parseInt(id),
+        },
+        relations: {
+          productCategory: true,
+          productImages: true,
+          productVariants: {
+            product: true,
+            variantValues: true,
+          },
+        },
+      });
+
+      const client = new Client({
+        cloud: {
+          id: "DATN:dXMtY2VudHJhbDEuZ2NwLmNsb3VkLmVzLmlvOjQ0MyQ2OTJjODU3YWYwYzU0NzhhOGVjY2YyMWI4MGU4YTY5NCQwNDQ1OWE2NTcyYmI0ZGExYTRjNzU3NmEzMTIzZmZhNg==",
+        },
+        auth: {
+          username: "elastic",
+          password: "jA4Lwj1ld76A5JsmWwgmo7md",
+        },
+      });
+
+      if (newData) {
+        client.update({
+          index: "productv3",
+          id: `${newData.id}`,
+          doc: {
+            ...newData,
+          },
+        });
+      }
       return {
         status: 200,
         data: {
@@ -888,37 +1021,41 @@ export const product_services = {
       },
     });
     try {
-      const data = await Product.find({
-        where: {
-          isActive: false,
-        },
-        relations: {
-          productCategory: true,
-          productImages: true,
-          productVariants: {
-            variantValues: true,
-          },
-        },
-      });
+      // const data = await Product.find({
+      //   where: {
+      //     isActive: false,
+      //   },
+      //   // relations: {
+      //   //   productCategory: true,
+      //   //   productImages: true,
+      //   //   productVariants: {
+      //   //     variantValues: true,
+      //   //   },
+      //   // },
+      // });
 
-      if (data) {
-        const fetchData = async () => {
-          await Promise.all(
-            data.map((item) =>
-              client.index({
-                index: "product",
-                document: {
-                  ...item,
-                },
-              })
-            )
-          );
-        };
-        await fetchData();
-      }
+      // if (data) {
+      //   const fetchData = async () => {
+      //     await Promise.all(
+      //       data.map((item) =>
+      //         client.index({
+      //           index: "product",
+      //           document: {
+      //             ...item,
+      //           },
+      //         })
+      //       )
+      //     );
+      //   };
+      //   await fetchData();
+      // }
+
+      // await client.indices.refresh({ index: "product" });
 
       const result = await client.search({
-        index: "product",
+        index: "productv3",
+        // from: 5,
+        size: 50,
         query: {
           match: {
             name: keyword,
