@@ -1093,4 +1093,35 @@ export const product_services = {
       };
     }
   },
+
+  getAllNameProduct: async (): Promise<resData<any> | resMessage> => {
+    try {
+      let [data, count] = await Product.findAndCount({
+        where: {
+          isActive: false,
+        },
+        withDeleted: false,
+      });
+
+      const productNames = data.map((product) => product.name);
+      return {
+        status: 200,
+        data: {
+          data: {
+            rows: productNames,
+            count,
+          },
+          message: "Success",
+        },
+      };
+    } catch (error) {
+      console.log(error);
+      return {
+        status: 500,
+        data: {
+          message: "Error",
+        },
+      };
+    }
+  },
 };

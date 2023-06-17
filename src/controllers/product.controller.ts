@@ -2,6 +2,11 @@ import { Request, Response } from "express";
 import { product_services } from "../services/product.services";
 
 export const product_controller = {
+  getAllNameProduct: async (req: Request, res: Response) => {
+    const { data, status } = await product_services.getAllNameProduct();
+    return res.status(status).json(data);
+  },
+
   searchProduct: async (req: Request, res: Response) => {
     const { data, status } = await product_services.searchProduct(req.query);
     return res.status(status).json(data);
