@@ -11,6 +11,8 @@ import {
 } from "typeorm";
 import { Comment } from "./Comment";
 import { Payment } from "./Payment";
+import { Coupon } from "./Coupon";
+import { CouponUser } from "./CouponUser";
 
 @Unique(["email"])
 @Entity()
@@ -83,4 +85,10 @@ export class User extends BaseEntity {
 
   @OneToMany(() => Payment, (e) => e.user)
   payments: Payment[];
+
+  @OneToMany(() => CouponUser, (e) => e.user)
+  couponusers: CouponUser[];
+
+  @OneToMany(() => Coupon, (e) => e.user)
+  coupons: Coupon[];
 }

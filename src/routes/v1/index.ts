@@ -18,6 +18,7 @@ import newsRouter from "./news.routes";
 import commentRouter from "./comment.routes";
 import paymentRouter from "./payment.routes";
 import adminRouter from "./admin.routes";
+import couponRouter from "./coupon.routes";
 
 const router = Router();
 router.use("/api/upload", uploadRouter);
@@ -39,5 +40,6 @@ router.use("/api/news", newsRouter);
 router.use("/api/comment", commentRouter);
 router.use("/api/payment", paymentRouter);
 router.use("/api/admin", adminRouter);
+router.use("/api/coupon", couponRouter);
 
 export default router;
