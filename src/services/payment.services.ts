@@ -12,6 +12,7 @@ import { createPayment, getAllPayment, updatePayment } from "../types/payemnt";
 import moment from "moment";
 import qs from "qs";
 import crypto from "crypto";
+import { CouponUser } from "../entities/CouponUser";
 
 export const payment_services = {
   getAllPaymentItem: async (): Promise<resData<Payment[]> | resMessage> => {
@@ -210,6 +211,14 @@ export const payment_services = {
   },
   create: async (body: createPayment, userId: number): Promise<any> => {
     try {
+      // xóa coupon
+      if (body.couponId !== undefined) {
+        await CouponUser.save({
+          couponId: body.couponId,
+          userId,
+        });
+      }
+
       // lấy giỏ hàng theo userId
       const cart = await Cart.findOne({
         where: {
@@ -287,7 +296,6 @@ export const payment_services = {
     } catch (error) {
       console.log(error);
     }
-
     return {
       status: 500,
       data: {

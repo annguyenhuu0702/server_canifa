@@ -1,5 +1,7 @@
+import { In, MoreThanOrEqual, Not } from "typeorm";
 import { resData, resMessage, resType } from "../common/type";
 import { Coupon } from "../entities/Coupon";
+import { CouponUser } from "../entities/CouponUser";
 import { createCoupon, getAllCoupon } from "../types/coupon";
 
 export const coupon_services = {
@@ -71,76 +73,108 @@ export const coupon_services = {
       };
     }
   },
-  // update: async (id: string, body: updateNews): Promise<resMessage> => {
-  //   try {
-  //     const item = await News.findOne({
-  //       where: {
-  //         id: parseInt(id),
-  //       },
-  //     });
-  //     await News.update(
-  //       {
-  //         id: parseInt(id),
-  //       },
-  //       body
-  //     );
-  //     if (item) {
-  //       if (item.thumbnail && item.thumbnail !== body.thumbnail) {
-  //         await getCloudinary().v2.uploader.destroy(
-  //           "canifa" + item.thumbnail.split("canifa")[1].split(".")[0]
-  //         );
-  //       }
-  //     }
-  //     await News.save({
-  //       ...item,
-  //       ...body,
-  //     });
-  //     return {
-  //       status: 200,
-  //       data: {
-  //         message: "Update successfully",
-  //       },
-  //     };
-  //   } catch (error) {
-  //     console.log(error);
-  //     return {
-  //       status: 500,
-  //       data: {
-  //         message: "Error",
-  //       },
-  //     };
-  //   }
-  // },
-  // delete: async (id: string): Promise<resMessage> => {
-  //   try {
-  //     const item = await AppDataSource.getRepository(News).findOneBy({
-  //       id: parseInt(id),
-  //     });
-  //     if (item) {
-  //       if (item.thumbnail && item.thumbnail !== "") {
-  //         await getCloudinary().v2.uploader.destroy(
-  //           "canifa" + item.thumbnail.split("canifa")[1].split(".")[0]
-  //         );
-  //       }
-  //       await AppDataSource.getRepository(News).softDelete({
-  //         id: item.id,
-  //       });
-  //     }
 
-  //     return {
-  //       status: 200,
-  //       data: {
-  //         message: "Delete successfully",
-  //       },
-  //     };
-  //   } catch (error) {
-  //     console.log(error);
-  //     return {
-  //       status: 500,
-  //       data: {
-  //         message: "Error",
-  //       },
-  //     };
-  //   }
-  // },
+  getCouponByUser: async (
+    user: any
+  ): Promise<resData<Coupon[]> | resMessage> => {
+    try {
+      // const couponusers = await CouponUser.find({
+      //   select: ["couponId"],
+      //   where: {
+      //     userId: user.id,
+      //   },
+      // });
+      // console.log(couponusers);
+      // if (couponusers) {
+      //   couponusers.map((item) => item.couponId);
+      // }
+      const usedCouponIds = await CouponUser.find({
+        select: ["couponId"],
+        where: {
+          userId: user.id,
+        },
+      }).then((couponUsers) => couponUsers.map((item) => item.couponId));
+      const [data, count] = await Coupon.findAndCount({
+        where: {
+          id: Not(In(usedCouponIds)),
+
+          endday: MoreThanOrEqual(new Date()),
+        },
+        order: {
+          createdAt: "DESC",
+        },
+      });
+      return {
+        status: 200,
+        data: {
+          data: {
+            rows: data,
+            count,
+          },
+          message: "success",
+        },
+      };
+    } catch (error) {
+      console.log(error);
+      return {
+        status: 500,
+        data: {
+          message: "Error",
+        },
+      };
+    }
+  },
+
+  checkCoupon: async (data: any, body: any): Promise<any | resMessage> => {
+    const { couponId } = body;
+    try {
+      const couponuser = await CouponUser.findOne({
+        where: {
+          userId: data.id,
+        },
+      });
+      if (!couponuser) {
+        const data = await Coupon.findOne({
+          where: {
+            id: couponId,
+          },
+        });
+        if (data) {
+          if (data.type === "freeship") {
+            return {
+              status: 200,
+              data: {
+                message: "freeship",
+              },
+            };
+          }
+          if (data.type === "discountorder") {
+            return {
+              status: 200,
+              data: {
+                data: {
+                  percent: data.percent,
+                },
+                message: "success",
+              },
+            };
+          }
+        }
+      }
+      return {
+        status: 204,
+        data: {
+          message: "Có vẻ như đang bị lỗi gì đó",
+        },
+      };
+    } catch (error) {
+      console.log(error);
+      return {
+        status: 500,
+        data: {
+          message: "Error",
+        },
+      };
+    }
+  },
 };

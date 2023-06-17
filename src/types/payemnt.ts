@@ -12,6 +12,7 @@ type createPayment = {
   isPaid: boolean;
   shippingCost: number;
   totalPrice: number;
+  couponId: number;
 };
 
 type updatePayment = createPayment & {
