@@ -133,38 +133,28 @@ export const coupon_services = {
           userId: data.id,
         },
       });
+      const newData = await Coupon.findOne({
+        where: {
+          id: couponId,
+        },
+      });
       if (!couponuser) {
-        const data = await Coupon.findOne({
-          where: {
-            id: couponId,
-          },
-        });
-        if (data) {
-          if (data.type === "freeship") {
-            return {
-              status: 200,
-              data: {
-                message: "freeship",
-              },
-            };
-          }
-          if (data.type === "discountorder") {
-            return {
-              status: 200,
-              data: {
-                data: {
-                  percent: data.percent,
-                },
-                message: "success",
-              },
-            };
-          }
+        if (newData?.type === "freeship") {
+          return {
+            status: 200,
+            data: {
+              message: "freeship",
+            },
+          };
         }
       }
       return {
-        status: 204,
+        status: 200,
         data: {
-          message: "Có vẻ như đang bị lỗi gì đó",
+          data: {
+            percent: newData?.percent,
+          },
+          message: "success",
         },
       };
     } catch (error) {
